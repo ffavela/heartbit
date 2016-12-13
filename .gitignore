@@ -3,6 +3,7 @@ resources/*
 _pycache_/
 _pycache_/*
 
+canvasClickEx.py
 *.txt
 *.zip
 *.tar.gz
