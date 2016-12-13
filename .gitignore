@@ -1,0 +1,15 @@
+resources/
+resources/*
+_pycache_/
+_pycache_/*
+
+*.txt
+*.zip
+*.tar.gz
+*.png
+*.svg
+*.jpg
+*.odt
+*.pyc
+*.xml
+
