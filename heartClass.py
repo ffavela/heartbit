@@ -11,18 +11,14 @@ class myAwesomeClass():
         self.myRandInt=0
         self.myPoint=(0,0)
 
-        self.R=135 # Just putting some value
-        self.dR=50
-        self.ang=0
-        self.dAng=1
-        self.N=10
-        self.vPoints=[]
-        self.vertexList=[]
         self.poly4DrawList=[]
         self.polyDrawnL=[]
         self.explodedPoints=[]
         self.shapelyPolyList=[]
-        self.center=[205,184]
+        self.W=411
+        self.H=371
+        self.center=[int(self.W/2),int(self.H/2)]
+        self.BigR=int(min(self.W,self.H)/2)
 
         # master.iconbitmap(r"heart.png")
 
@@ -69,7 +65,8 @@ class myAwesomeClass():
         # self.photoD = PhotoImage(file="resources/aRing.png")
         # self.photoEx = PhotoImage(file="resources/randDraw.png")
         
-        self.canvasD = Canvas(rDownFrame, bg="white", width=409, height=369)
+        self.canvasD = Canvas(rDownFrame, bg="white", width=self.W, height=self.H)
+
         # self.canvasD.bind("<Enter>", partial(color_config, text, "red"))
         
         self.canvasD.grid(row = 0, column = 0)
@@ -98,13 +95,7 @@ class myAwesomeClass():
         # self.poly = self.canvasD.create_polygon(self.pointStuff,fill="green",stipple="gray50")
 
         #The new functions
-        print("vertexList b4 func", self.vertexList)
-        self.createVertex4Poly()
-        self.reCenterPolyCoords()
-        self.makePolyDrawList()
-        self.makeShapelyPolyList()
-        self.drawPolygons()
-        # print("vertexList after func", self.vertexList)
+        self.initRing()
 
         # self.canvasD.delete(self.poly)
 
@@ -124,14 +115,16 @@ class myAwesomeClass():
         #     print("Point inside the polygon!!")
         self.checkEventInPolyList(event.x, event.y)
         self.genRandInt()
-        print("getPolySides(%d) = %d" % (self.myRandInt, self.getPolySides(self.myRandInt)))
+        # print("getPolySides(%d) = %d" % (self.myRandInt, self.getPolySides(self.myRandInt)))
 
 
     def callback(self, event):
         print("Upper canvas")
         print("clicked at", event.x, event.y)
         self.genRandInt()
-        print("getPolySides(%d) = %d" % (self.myRandInt, self.getPolySides(self.myRandInt)))
+        self.canvasD.delete("all")
+        self.initRing()
+        # print("getPolySides(%d) = %d" % (self.myRandInt, self.getPolySides(self.myRandInt)))
 
     def key(self, event):
         print("pressed", repr(event.char))
@@ -148,49 +141,61 @@ class myAwesomeClass():
     def genRandInt(self):
         self.myRandInt=random.randint(1,12)
 
-    def createVertex4Poly(self):
-        self.ang=0
-        self.dAng=2*pi/self.N
-        self.vertexList=[]#Make sure it's empty
-        for i in range(self.N):
-            self.vPoints=[[],[],[],[]]
-            self.vPoints[0]=[self.R*cos(self.ang),self.R*sin(self.ang)]
-            self.vPoints[1]=[(self.R+self.dR)*cos(self.ang),\
-                             (self.R+self.dR)*sin(self.ang)]
-            self.vPoints[2]=[(self.R+self.dR)*cos(self.ang+self.dAng),\
-                             (self.R+self.dR)*sin(self.ang+self.dAng)]
-            self.vPoints[3]=[self.R*cos(self.ang+self.dAng),\
-                             self.R*sin(self.ang+self.dAng)]
-            self.ang+=self.dAng
+    def createVertex4Poly(self,R,dR,N):
+        ang=-pi/2
+        dAng=2*pi/N
+        # dR*=-1 #Making it negative
+        localVertexList=[]
+        for i in range(N):
+            vPoints=[[],[],[],[]]
+            vPoints[0]=[R*cos(ang),R*sin(ang)]
+            vPoints[1]=[(R+dR)*cos(ang),(R+dR)*sin(ang)]
+            vPoints[2]=[(R+dR)*cos(ang+dAng),(R+dR)*sin(ang+dAng)]
+            vPoints[3]=[R*cos(ang+dAng),R*sin(ang+dAng)]
+            ang+=dAng
 
-            self.vertexList.append(self.vPoints)
+            localVertexList.append(vPoints)
+        return localVertexList
 
-    def reCenterPolyCoords(self):
+    def reCenterPolyCoords(self,vList):
         newList=[]
-        for e in self.vertexList:
+        for e in vList:
             newE=[[p[0]+self.center[0], p[1]+self.center[1]] for p in e]
             newList.append(newE)
 
-        self.vertexList=newList
+        return newList
 
-    def makePolyDrawList(self):
+    def makePolyDrawList(self,vList):
         #the vertex list has to be already created and recentered
         self.poly4DrawList=[]
-        for e in self.vertexList:
+        for e in vList:
             self.explodedPoints=[item for t in e for item in t]
             self.poly4DrawList.append(self.explodedPoints)
 
-    def makeShapelyPolyList(self):
+    def makeShapelyPolyList(self,myVList):
         self.shapelyPolyList=[]
-        for poly in self.vertexList:
+        for poly in myVList:
             convexPolyPoints=list(MultiPoint(poly).convex_hull.exterior.coords)
             shapelyPolygon=Polygon(convexPolyPoints)
             self.shapelyPolyList.append(shapelyPolygon)
 
-
     def drawPolygons(self):
         for poly in self.poly4DrawList:
             self.polyDrawnL.append(self.canvasD.create_polygon(poly,fill="blue",stipple="gray50", outline="#f12", width=2))
+
+    def initRing(self):
+        print("Inside initRing")
+        # self.createVertex4Poly()
+        # vLVList=self.createVertex4Poly()
+        vLVList=self.createMultiRings(2)
+        # vLVList=self.createVertex4Poly(135,50,random.randint(3,48))
+
+        myVList=self.reCenterPolyCoords(vLVList[0])
+        self.makePolyDrawList(myVList)
+        self.makeShapelyPolyList(myVList)
+        self.drawPolygons()
+
+
 
     def checkEventInPolyList(self,xVal,yVal):
         self.myPoint=Point(xVal, yVal)
@@ -200,6 +205,18 @@ class myAwesomeClass():
                 theIndex=self.shapelyPolyList.index(poly)
                 print("The index is %d" % theIndex)
                 break
+
+    def createMultiRings(self,rN):
+        multiRingList=[[] for e in range(rN)]
+        R=self.BigR
+        dR=-50
+        N=random.randint(3,48)
+
+        for i in range(rN):
+            multiRingList[i]=self.createVertex4Poly(R,dR,N)
+            R+=dR
+
+        return multiRingList
 
     # def color_config(self, widget, color, event):
     #     widget.configure(foreground=color)
