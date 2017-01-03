@@ -7,18 +7,27 @@ class myAwesomeClass():
     def __init__(self, master):
 
         master.wm_title("Heartbit")
-        self.sideList=[16,24,32,40,40,48,48,48,48]
+        self.sideList=[16,24,32,40,40,48,48,48,48,60,60]
+        self.listIndex=0
         self.myRandInt=0
         self.myPoint=(0,0)
 
-        self.poly4DrawList=[]
-        self.polyDrawnL=[]
-        self.explodedPoints=[]
-        self.shapelyPolyList=[]
-        self.W=411
-        self.H=371
+        self.W=800
+        self.H=750
         self.center=[int(self.W/2),int(self.H/2)]
         self.BigR=int(min(self.W,self.H)/2)
+
+        self.UW=610
+        self.UH=152
+
+        self.vList=[]
+        self.myVList=[]
+        self.shapelyPolyList=[]
+        self.poly4DrawList=[]
+        self.polyDrawnL=[]
+        self.shapelyPolyList=[]
+        self.masterList=[]
+        self.onOffList=[]
 
         # master.iconbitmap(r"heart.png")
 
@@ -52,7 +61,7 @@ class myAwesomeClass():
         #The right top image
         self.photoT = PhotoImage(file="resources/chimera.png")
         
-        self.canvasU= Canvas(rUpFrame, bg="white", width=610, height=152)
+        self.canvasU= Canvas(rUpFrame, bg="white", width=self.UW, height=self.UH)
         
         self.canvasU.grid(row = 0, column = 0)
         self.canvasU.create_image(306,77, image=self.photoT)
@@ -94,8 +103,9 @@ class myAwesomeClass():
 
         # self.poly = self.canvasD.create_polygon(self.pointStuff,fill="green",stipple="gray50")
 
+        self.masterList=self.fillAllRings()
         #The new functions
-        self.initRing()
+        self.initRing(0)
 
         # self.canvasD.delete(self.poly)
 
@@ -113,17 +123,26 @@ class myAwesomeClass():
         self.myPoint=Point(event.x, event.y)
         # if self.shapelyPoly.contains(self.myPoint):
         #     print("Point inside the polygon!!")
-        self.checkEventInPolyList(event.x, event.y)
-        self.genRandInt()
+        indexList=self.checkEventInPolyList(event.x, event.y)
+        print("Index list is: ",indexList)
+        print("b4 if len(self.poly4DrawList)",len(self.poly4DrawList))
+        if indexList != []:
+            self.redrawRing(indexList)
+        # self.genRandInt()
         # print("getPolySides(%d) = %d" % (self.myRandInt, self.getPolySides(self.myRandInt)))
 
 
     def callback(self, event):
         print("Upper canvas")
-        print("clicked at", event.x, event.y)
-        self.genRandInt()
-        self.canvasD.delete("all")
-        self.initRing()
+        x=event.x
+        y=event.y
+        print("clicked at", x, y)
+        region=self.ringRegion(x,y)
+        self.listIndex=region
+        print("region = ", region)
+        
+        # self.genRandInt()
+        self.initRing(region)
         # print("getPolySides(%d) = %d" % (self.myRandInt, self.getPolySides(self.myRandInt)))
 
     def key(self, event):
@@ -138,8 +157,8 @@ class myAwesomeClass():
             return self.sideList[ringNum-1]
         return 0
 
-    def genRandInt(self):
-        self.myRandInt=random.randint(1,12)
+    # def genRandInt(self):
+    #     self.myRandInt=random.randint(1,12)
 
     def createVertex4Poly(self,R,dR,N):
         ang=-pi/2
@@ -158,59 +177,146 @@ class myAwesomeClass():
         return localVertexList
 
     def reCenterPolyCoords(self,vList):
-        newList=[]
-        for e in vList:
-            newE=[[p[0]+self.center[0], p[1]+self.center[1]] for p in e]
-            newList.append(newE)
+        newList=[[] for e in vList]
+        for i in range(len(vList)):
+            for e in vList[i]:
+                newE=[[p[0]+self.center[0], p[1]+self.center[1]] for p in e]
+                newList[i].append(newE)
 
         return newList
 
+    def getOnOffList(self,aList):
+        onOffList=[[True for e in t] for t in aList]
+        return onOffList
+    
     def makePolyDrawList(self,vList):
         #the vertex list has to be already created and recentered
-        self.poly4DrawList=[]
-        for e in vList:
-            self.explodedPoints=[item for t in e for item in t]
-            self.poly4DrawList.append(self.explodedPoints)
+        p4DList=[[] for e in vList]
+        for i in range(len(vList)):
+            for e in vList[i]:
+                expPoints=[item for t in e for item in t]
+                p4DList[i].append(expPoints)
 
+        return p4DList
+    
+    def ringRegion(self,x,y):
+        divNum=11
+        deltaPos=self.UW/divNum
+        for i in range(divNum+1):
+            if x < i*deltaPos:
+                return 10-(i-1)
+        
+    
     def makeShapelyPolyList(self,myVList):
-        self.shapelyPolyList=[]
-        for poly in myVList:
-            convexPolyPoints=list(MultiPoint(poly).convex_hull.exterior.coords)
-            shapelyPolygon=Polygon(convexPolyPoints)
-            self.shapelyPolyList.append(shapelyPolygon)
+        # myShapelyPolyList=[]
+        # for poly in myVList:
+        #     convexPolyPoints=list(MultiPoint(poly).convex_hull.exterior.coords)
+        #     shapelyPolygon=Polygon(convexPolyPoints)
+        #     myShapelyPolyList.append(shapelyPolygon)
+        # return myShapelyPolyList
 
-    def drawPolygons(self):
-        for poly in self.poly4DrawList:
-            self.polyDrawnL.append(self.canvasD.create_polygon(poly,fill="blue",stipple="gray50", outline="#f12", width=2))
+        myShapelyPolyList=[[] for e in myVList]
+        for i in range(len(myVList)):
+            for poly in myVList[i]:
+                convexPolyPoints=list(MultiPoint(poly).convex_hull.exterior.coords)
+                shapelyPolygon=Polygon(convexPolyPoints)
+                myShapelyPolyList[i].append(shapelyPolygon)
+        return myShapelyPolyList
 
-    def initRing(self):
+    def drawPolygons(self, poly4DrawList, indexStuff=[]):
+        def getColor(i,polyIndex,indexStuff=[]):
+            color="green"
+            if i%2 == 0:
+                color="blue"
+            print(i,polyIndex)
+            print("onOffList")
+            print(self.onOffList)
+            if self.onOffList != [] and self.onOffList[i][polyIndex] == False:
+                color="red"
+
+            if indexStuff != []:
+                if indexStuff[0] == i and polyIndex == indexStuff[1]:
+                    if self.onOffList[i][polyIndex] == True:
+                        self.onOffList[i][polyIndex] = False
+                        color="red"
+                    else:
+                        self.onOffList[i][polyIndex] = True
+            return color
+        
+        polyDrawnL=[[] for e in poly4DrawList]
+        print("len(poly4DrawList) = ", len(poly4DrawList))
+        for i in range(len(poly4DrawList)):
+            color=getColor(i,0,indexStuff)
+            for poly in poly4DrawList[i]:
+                if indexStuff != []:
+                    polyIndex=poly4DrawList[i].index(poly)
+                    color=getColor(i,polyIndex,indexStuff)
+
+                polyDrawnL[i].append(self.canvasD.create_polygon(poly,fill=color,stipple="gray50", outline="#f12", width=2))
+
+        return polyDrawnL
+
+    def fillAllRings(self):
+        sideList=self.sideList
+        masterList=[[] for t in sideList]
+        for e,i in zip(sideList,range(len(sideList))):
+            self.listIndex=i#This is for the createMultiRings part
+            vLVList=self.createMultiRings(2)
+            myVList=self.reCenterPolyCoords(vLVList)
+            shapelyPolyList=self.makeShapelyPolyList(myVList)
+            poly4DrawList=self.makePolyDrawList(myVList)
+            onOffList=self.getOnOffList(myVList)
+
+            #populating the masterList with the polygon data
+            masterList[i].append(myVList)#Centered polygon list
+            masterList[i].append(shapelyPolyList)#Shapely polygons
+            masterList[i].append(poly4DrawList)#Polygons 4 drawing
+            masterList[i].append(onOffList)#Detector status
+
+            print("len(onOffList)",len(onOffList))
+            
+        return masterList
+            
+    def initRing(self,ringNum=0):
         print("Inside initRing")
-        # self.createVertex4Poly()
-        # vLVList=self.createVertex4Poly()
-        vLVList=self.createMultiRings(2)
-        # vLVList=self.createVertex4Poly(135,50,random.randint(3,48))
+        self.canvasD.delete("all")
 
-        myVList=self.reCenterPolyCoords(vLVList[0])
-        self.makePolyDrawList(myVList)
-        self.makeShapelyPolyList(myVList)
-        self.drawPolygons()
+        self.myVList=self.masterList[ringNum][0]
+        self.shapelyPolyList=self.masterList[ringNum][1]
 
+        self.poly4DrawList=self.masterList[ringNum][2]
 
+        self.polyDrawnL=self.drawPolygons(self.poly4DrawList)
 
+        self.onOffList=self.masterList[ringNum][3]
+        print("initRing, self.onOffList = ",self.onOffList)
+        
+    def redrawRing(self, indexList):
+        self.canvasD.delete("all")
+        self.polyDrawnL=self.drawPolygons(self.poly4DrawList, indexList)
+        
     def checkEventInPolyList(self,xVal,yVal):
+        #Add an argument to shapelyPolyList and adapt it
         self.myPoint=Point(xVal, yVal)
-        for poly in self.shapelyPolyList:
-            if poly.contains(self.myPoint):
-                print("Point inside poly list!!")
-                theIndex=self.shapelyPolyList.index(poly)
-                print("The index is %d" % theIndex)
-                break
+        # for poly in self.shapelyPolyList:
+        for ring in self.shapelyPolyList:
+            for poly in ring:
+                if poly.contains(self.myPoint):
+                    print("Point inside poly list!!")
+                    theRIndex=self.shapelyPolyList.index(ring)
+                    print("The ring index is %d" % theRIndex)
+
+                    theIndex=self.shapelyPolyList[theRIndex].index(poly)
+                    print("The index is %d" % theIndex)
+                    return [theRIndex, theIndex]
+        return []
 
     def createMultiRings(self,rN):
         multiRingList=[[] for e in range(rN)]
         R=self.BigR
         dR=-50
-        N=random.randint(3,48)
+        # N=random.randint(3,48)
+        N=self.sideList[self.listIndex]
 
         for i in range(rN):
             multiRingList[i]=self.createVertex4Poly(R,dR,N)
