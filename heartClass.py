@@ -60,12 +60,12 @@ class myAwesomeClass():
 
         #The right top image
         self.photoT = PhotoImage(file="resources/chimera.png")
-        
+
         self.canvasU= Canvas(rUpFrame, bg="white", width=self.UW, height=self.UH)
-        
+
         self.canvasU.grid(row = 0, column = 0)
         self.canvasU.create_image(306,77, image=self.photoT)
-        
+
         self.canvasU.bind("<Key>", self.key)
         self.canvasU.bind("<Button-1>", self.callback)
         self.canvasU.pack()
@@ -73,11 +73,11 @@ class myAwesomeClass():
         #The right down image
         # self.photoD = PhotoImage(file="resources/aRing.png")
         # self.photoEx = PhotoImage(file="resources/randDraw.png")
-        
+
         self.canvasD = Canvas(rDownFrame, bg="white", width=self.W, height=self.H)
 
         # self.canvasD.bind("<Enter>", partial(color_config, text, "red"))
-        
+
         self.canvasD.grid(row = 0, column = 0)
         # self.canvasD.create_image(204,185, image=self.photoD)
 
@@ -140,7 +140,7 @@ class myAwesomeClass():
         region=self.ringRegion(x,y)
         self.listIndex=region
         print("region = ", region)
-        
+
         # self.genRandInt()
         self.initRing(region)
         # print("getPolySides(%d) = %d" % (self.myRandInt, self.getPolySides(self.myRandInt)))
@@ -188,7 +188,7 @@ class myAwesomeClass():
     def getOnOffList(self,aList):
         onOffList=[[True for e in t] for t in aList]
         return onOffList
-    
+
     def makePolyDrawList(self,vList):
         #the vertex list has to be already created and recentered
         p4DList=[[] for e in vList]
@@ -198,23 +198,16 @@ class myAwesomeClass():
                 p4DList[i].append(expPoints)
 
         return p4DList
-    
+
     def ringRegion(self,x,y):
         divNum=11
         deltaPos=self.UW/divNum
         for i in range(divNum+1):
             if x < i*deltaPos:
                 return 10-(i-1)
-        
-    
-    def makeShapelyPolyList(self,myVList):
-        # myShapelyPolyList=[]
-        # for poly in myVList:
-        #     convexPolyPoints=list(MultiPoint(poly).convex_hull.exterior.coords)
-        #     shapelyPolygon=Polygon(convexPolyPoints)
-        #     myShapelyPolyList.append(shapelyPolygon)
-        # return myShapelyPolyList
 
+
+    def makeShapelyPolyList(self,myVList):
         myShapelyPolyList=[[] for e in myVList]
         for i in range(len(myVList)):
             for poly in myVList[i]:
@@ -228,9 +221,7 @@ class myAwesomeClass():
             color="green"
             if i%2 == 0:
                 color="blue"
-            print(i,polyIndex)
-            print("onOffList")
-            print(self.onOffList)
+            # print(i,polyIndex)
             if self.onOffList != [] and self.onOffList[i][polyIndex] == False:
                 color="red"
 
@@ -241,18 +232,23 @@ class myAwesomeClass():
                         color="red"
                     else:
                         self.onOffList[i][polyIndex] = True
+                        color="green"
+                        if i%2 == 0:
+                            color="blue"
             return color
-        
+
         polyDrawnL=[[] for e in poly4DrawList]
         print("len(poly4DrawList) = ", len(poly4DrawList))
+
         for i in range(len(poly4DrawList)):
-            color=getColor(i,0,indexStuff)
             for poly in poly4DrawList[i]:
-                if indexStuff != []:
-                    polyIndex=poly4DrawList[i].index(poly)
-                    color=getColor(i,polyIndex,indexStuff)
+                polyIndex=poly4DrawList[i].index(poly)
+                color=getColor(i,polyIndex,indexStuff)
 
                 polyDrawnL[i].append(self.canvasD.create_polygon(poly,fill=color,stipple="gray50", outline="#f12", width=2))
+
+        print("onOffList")
+        print(self.onOffList)
 
         return polyDrawnL
 
@@ -274,9 +270,9 @@ class myAwesomeClass():
             masterList[i].append(onOffList)#Detector status
 
             print("len(onOffList)",len(onOffList))
-            
+
         return masterList
-            
+
     def initRing(self,ringNum=0):
         print("Inside initRing")
         self.canvasD.delete("all")
@@ -286,15 +282,16 @@ class myAwesomeClass():
 
         self.poly4DrawList=self.masterList[ringNum][2]
 
-        self.polyDrawnL=self.drawPolygons(self.poly4DrawList)
-
         self.onOffList=self.masterList[ringNum][3]
         print("initRing, self.onOffList = ",self.onOffList)
-        
+
+        self.polyDrawnL=self.drawPolygons(self.poly4DrawList)
+
+
     def redrawRing(self, indexList):
         self.canvasD.delete("all")
         self.polyDrawnL=self.drawPolygons(self.poly4DrawList, indexList)
-        
+
     def checkEventInPolyList(self,xVal,yVal):
         #Add an argument to shapelyPolyList and adapt it
         self.myPoint=Point(xVal, yVal)
@@ -326,4 +323,3 @@ class myAwesomeClass():
 
     # def color_config(self, widget, color, event):
     #     widget.configure(foreground=color)
-
