@@ -7,7 +7,7 @@ class myAwesomeClass():
     def __init__(self, master):
 
         master.wm_title("Heartbit")
-        self.sideList=[16,24,32,40,40,48,48,48,48,60,60]
+        self.sideList=[16,24,32,40,40,48,48,48,48,32,32]
         self.listIndex=0
         self.myRandInt=0
         self.myPoint=(0,0)
@@ -25,10 +25,11 @@ class myAwesomeClass():
         self.shapelyPolyList=[]
         self.poly4DrawList=[]
         self.polyDrawnL=[]
-        self.shapelyPolyList=[]
+        # self.shapelyPolyList=[] #Twice?!
         self.masterList=[]
         self.onOffList=[]
 
+        self.dIntList=[]
         # master.iconbitmap(r"heart.png")
 
         v = IntVar()
@@ -104,8 +105,16 @@ class myAwesomeClass():
         # self.poly = self.canvasD.create_polygon(self.pointStuff,fill="green",stipple="gray50")
 
         self.masterList=self.fillAllRings()
+
+        self.dIntList=self.detect2Num(self.masterList)
+        self.printRtest(self.dIntList)
+
         #The new functions
         self.initRing(0)
+
+        # print("test getPidNumber", self.getPidNumber(1,0,0,1), self.getPidNumber(0,0,1,67),self.getPidNumber(1,3,0,5),self.getPidNumber(0,3,3,67),self.getPidNumber(4,2,3,56))
+
+        # print("test getCrateRoute", self.getCrateRoute(1090),self.getCrateRoute(136),self.getCrateRoute(1910),self.getCrateRoute(1088),self.getCrateRoute(5157))
 
         # self.canvasD.delete(self.poly)
 
@@ -118,14 +127,15 @@ class myAwesomeClass():
         # self.canvasD.delete(self.arc)
 
     def callbackD(self, event):
-        print("Lower canvas")
-        print("clicked at", event.x, event.y)
+        # print("Lower canvas")
+        # print("clicked at", e
+              # vent.x, event.y)
         self.myPoint=Point(event.x, event.y)
         # if self.shapelyPoly.contains(self.myPoint):
         #     print("Point inside the polygon!!")
         indexList=self.checkEventInPolyList(event.x, event.y)
-        print("Index list is: ",indexList)
-        print("b4 if len(self.poly4DrawList)",len(self.poly4DrawList))
+        # print("Index list is: ",indexList)
+        # print("b4 if len(self.poly4DrawList)",len(self.poly4DrawList))
         if indexList != []:
             self.redrawRing(indexList)
         # self.genRandInt()
@@ -133,13 +143,13 @@ class myAwesomeClass():
 
 
     def callback(self, event):
-        print("Upper canvas")
+        # print("Upper canvas")
         x=event.x
         y=event.y
-        print("clicked at", x, y)
+        # print("clicked at", x, y)
         region=self.ringRegion(x,y)
         self.listIndex=region
-        print("region = ", region)
+        # print("region = ", region)
 
         # self.genRandInt()
         self.initRing(region)
@@ -238,7 +248,7 @@ class myAwesomeClass():
             return color
 
         polyDrawnL=[[] for e in poly4DrawList]
-        print("len(poly4DrawList) = ", len(poly4DrawList))
+        # print("len(poly4DrawList) = ", len(poly4DrawList))
 
         for i in range(len(poly4DrawList)):
             for poly in poly4DrawList[i]:
@@ -247,8 +257,8 @@ class myAwesomeClass():
 
                 polyDrawnL[i].append(self.canvasD.create_polygon(poly,fill=color,stipple="gray50", outline="#f12", width=2))
 
-        print("onOffList")
-        print(self.onOffList)
+        # print("onOffList")
+        # print(self.onOffList)
 
         return polyDrawnL
 
@@ -257,7 +267,12 @@ class myAwesomeClass():
         masterList=[[] for t in sideList]
         for e,i in zip(sideList,range(len(sideList))):
             self.listIndex=i#This is for the createMultiRings part
-            vLVList=self.createMultiRings(2)
+            if self.listIndex == 9:
+                vLVList=self.createMultiRings(8)
+            elif self.listIndex == 10:
+                vLVList=self.createMultiRings(9)
+            else:
+                vLVList=self.createMultiRings(2)
             myVList=self.reCenterPolyCoords(vLVList)
             shapelyPolyList=self.makeShapelyPolyList(myVList)
             poly4DrawList=self.makePolyDrawList(myVList)
@@ -269,7 +284,7 @@ class myAwesomeClass():
             masterList[i].append(poly4DrawList)#Polygons 4 drawing
             masterList[i].append(onOffList)#Detector status
 
-            print("len(onOffList)",len(onOffList))
+            # print("len(onOffList)",len(onOffList))
 
         return masterList
 
@@ -283,7 +298,7 @@ class myAwesomeClass():
         self.poly4DrawList=self.masterList[ringNum][2]
 
         self.onOffList=self.masterList[ringNum][3]
-        print("initRing, self.onOffList = ",self.onOffList)
+        # print("initRing, self.onOffList = ",self.onOffList)
 
         self.polyDrawnL=self.drawPolygons(self.poly4DrawList)
 
@@ -312,14 +327,104 @@ class myAwesomeClass():
         multiRingList=[[] for e in range(rN)]
         R=self.BigR
         dR=-50
+        if rN > 5:
+            dR=-35
         # N=random.randint(3,48)
         N=self.sideList[self.listIndex]
+        if self.listIndex == 10:
+            rN-=2
 
         for i in range(rN):
             multiRingList[i]=self.createVertex4Poly(R,dR,N)
             R+=dR
 
+        if self.listIndex == 10:
+            N=16
+            multiRingList[rN]=self.createVertex4Poly(R,dR,N)
+            R+=dR
+            N=8
+            multiRingList[rN+1]=self.createVertex4Poly(R,dR,N)
+
         return multiRingList
 
     # def color_config(self, widget, color, event):
     #     widget.configure(foreground=color)
+
+    def detect2Num(self,detectSet):
+        # print("Inside detect2Num")
+        dNumber=0
+        # print("lenStuff = ",len(detectSet))
+        dIntList=[[[0 for d in ring] for ring in section[1]]\
+                  for section in detectSet]
+        # print("After the dIntList generation")
+        for sIndex in range(len(detectSet)):
+            # sIndex=detectSet.index(section)
+            # print("sIndex = ", sIndex)
+            section=detectSet[sIndex][1]#Using the polyList
+            # print("Section len = ", len(section))
+            for rIndex in range(len(section)):
+                # rIndex=section.index(ring)
+                # print("rIndex = ", rIndex)
+                ring=section[rIndex]
+                # print("ring len", len(ring))
+                for dIndex in range(len(ring)):
+                    # dIndex=ring.index(detect)
+
+                    # print("dIndex = ", dIndex)
+                    dIntList[sIndex][rIndex][dIndex]=dNumber
+                    dNumber+=1
+                    # print("dNumber = ", dNumber)
+        # print("dNumber = ", dNumber)
+        return dIntList
+
+    #Simple test print out
+    def printRtest(self, dIntList):
+        # print("Inside print2Test")
+        for sec in dIntList:
+            sIndex=dIntList.index(sec)
+            # print("Section = ", sIndex)
+            for ring in sec:
+                rIndex=sec.index(ring)
+                # print("Ringnum = ", rIndex)
+                # print("listValue = ", dIntList[sIndex][rIndex])
+
+    def getPidNumber(self,cobo, asad, aget, chan):
+        #TODO: put this in a more global place
+        chanInAGET=68
+        agetInASAD=4
+        asadInCOBO=4
+        coboInCrate=10 #? Unsure of this
+
+        agetCoef=chanInAGET
+        asadCoef=agetInASAD*agetCoef
+        coboCoef=asadInCOBO*asadCoef
+
+        pid=coboCoef*cobo+asadCoef*asad+agetCoef*aget+chan+1
+        return pid
+
+    def getCrateRoute(self, pid):
+        #TODO: put this in a more global place
+        chanInAGET=68
+        agetInASAD=4
+        asadInCOBO=4
+        coboInCrate=10 #? Unsure of this
+
+        agetCoef=chanInAGET
+        asadCoef=agetInASAD*agetCoef
+        coboCoef=asadInCOBO*asadCoef
+
+        pid-=1
+
+        cobo = int(pid/coboCoef)
+        coboRes = pid%coboCoef
+
+        asad = int(coboRes/asadCoef)
+        asadRes = coboRes%asadCoef
+
+        aget = int(asadRes/agetCoef)
+        asadRes = asadRes % agetCoef
+
+        chan = asadRes
+
+
+        return [cobo,asad,aget,chan]
