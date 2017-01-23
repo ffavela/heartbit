@@ -128,6 +128,13 @@ class myAwesomeClass():
 
         self.dummyVar=getOptVal(self.doc,1,3,1,5, "isActive")
         print("Value of dummy var is", self.dummyVar)
+        print("The crate route of 1191 is ", self.getCrateRoute(1191))
+        invList=self.getCrateRoute(1191)
+        print(invList, self.getPidNumber(*invList))
+        print("The crate route of 0 is ", self.getCrateRoute(0))
+        print("The crate route of 1 is ", self.getCrateRoute(1))
+        invList=self.getCrateRoute(2)
+        print("The crate route of 2 is ", invList, self.getPidNumber(*invList))
 
         # print("test getPidNumber", self.getPidNumber(1,0,0,1), self.getPidNumber(0,0,1,67),self.getPidNumber(1,3,0,5),self.getPidNumber(0,3,3,67),self.getPidNumber(4,2,3,56))
 
@@ -416,7 +423,7 @@ class myAwesomeClass():
         asadCoef=agetInASAD*agetCoef
         coboCoef=asadInCOBO*asadCoef
 
-        pid=coboCoef*cobo+asadCoef*asad+agetCoef*aget+chan+1
+        pid=coboCoef*cobo+asadCoef*asad+agetCoef*aget+chan
         return pid
 
     def getCrateRoute(self, pid):
@@ -430,7 +437,7 @@ class myAwesomeClass():
         asadCoef=agetInASAD*agetCoef
         coboCoef=asadInCOBO*asadCoef
 
-        pid-=1
+        # pid-=1
 
         cobo = int(pid/coboCoef)
         coboRes = pid%coboCoef
