@@ -3,6 +3,8 @@ from shapely.geometry import Polygon,MultiPoint,Point
 import random
 from math import pi,sin,cos
 
+from xmlParser import *
+
 class myAwesomeClass():
     def __init__(self, master):
 
@@ -31,6 +33,12 @@ class myAwesomeClass():
 
         self.dIntList=[]
         # master.iconbitmap(r"heart.png")
+
+        self.doc=getXmlDoc('configure-cobomutant.xcfg')
+
+        self.var=self.doc['Setup']['@id'] # == u'Conditions'
+
+        self.dummyVar=""
 
         v = IntVar()
         v.set(3)
@@ -111,6 +119,15 @@ class myAwesomeClass():
 
         #The new functions
         self.initRing(0)
+
+        print("the self.var = ", self.var)
+        print("Now printing conditions")
+        printDocProp(self.doc)
+
+        getRoute(self.doc, 1,3,1,5)
+
+        self.dummyVar=getOptVal(self.doc,1,3,1,5, "isActive")
+        print("Value of dummy var is", self.dummyVar)
 
         # print("test getPidNumber", self.getPidNumber(1,0,0,1), self.getPidNumber(0,0,1,67),self.getPidNumber(1,3,0,5),self.getPidNumber(0,3,3,67),self.getPidNumber(4,2,3,56))
 
@@ -425,6 +442,5 @@ class myAwesomeClass():
         asadRes = asadRes % agetCoef
 
         chan = asadRes
-
 
         return [cobo,asad,aget,chan]
