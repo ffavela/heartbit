@@ -79,70 +79,26 @@ class myAwesomeClass():
         self.canvasU.bind("<Button-1>", self.callback)
         self.canvasU.pack()
 
-        #The right down image
-        # self.photoD = PhotoImage(file="resources/aRing.png")
-        # self.photoEx = PhotoImage(file="resources/randDraw.png")
-
         self.canvasD = Canvas(rDownFrame, bg="white", width=self.W, height=self.H)
 
-        # self.canvasD.bind("<Enter>", partial(color_config, text, "red"))
-
         self.canvasD.grid(row = 0, column = 0)
-        # self.canvasD.create_image(204,185, image=self.photoD)
-
-        # self.canvasD.create_image(204,185, image=self.photoEx)
-        # self.canvas.delete(self.photoD)
-        # self.canvasD.delete(self.photoEx)
-
-        # self.canvasD.delete("all")
-        # self.coord = 10, 50, 240, 210
-        # self.arc = self.canvasD.create_arc(self.coord, start=0, extent=150, fill="blue", stipple="gray12")
-
-        #polygon
-        # self.poly = self.canvasD.create_polygon(10, 50, 15, 35, 80, 120, 100, 234)
-
-
-        # self.polyPoints=[(338,167),(405,160),(383,276),(321,246)]
-        # self.convexPolyPoints=list(MultiPoint(self.polyPoints).convex_hull.exterior.coords)
-        # self.shapelyPoly=Polygon(self.convexPolyPoints)
-
-        # self.pointStuff=[338,167,405,160,383,276,321,246]
-        #exploding the list
-        # self.pointStuff=[item for t in self.polyPoints for item in t]
-
-        # self.poly = self.canvasD.create_polygon(self.pointStuff,fill="green",stipple="gray50")
 
         self.masterList=self.fillAllRings()
-
-        self.dIntList=self.detect2Num(self.masterList)
-        self.printRtest(self.dIntList)
 
         #The new functions
         self.initRing(0)
 
-        print("the self.var = ", self.var)
-        print("Now printing conditions")
-        printDocProp(self.doc)
+        self.dIntList=self.detect2Num(self.masterList)
+        # self.printRtest(self.dIntList)
+
+        self.readXmlState()
+
+        # print("onOffList")
+        # print(self.onOffList)
 
         getRoute(self.doc, 1,3,1,5)
 
         self.dummyVar=getOptVal(self.doc,1,3,1,5, "isActive")
-        print("Value of dummy var is", self.dummyVar)
-        print("The crate route of 1191 is ", self.getCrateRoute(1191))
-        invList=self.getCrateRoute(1191)
-        print(invList, self.getPidNumber(*invList))
-        print("The crate route of 0 is ", self.getCrateRoute(0))
-        print("The crate route of 1 is ", self.getCrateRoute(1))
-        invList=self.getCrateRoute(2)
-        print("The crate route of 2 is ", invList, self.getPidNumber(*invList))
-
-        # print("test getPidNumber", self.getPidNumber(1,0,0,1), self.getPidNumber(0,0,1,67),self.getPidNumber(1,3,0,5),self.getPidNumber(0,3,3,67),self.getPidNumber(4,2,3,56))
-
-        # print("test getCrateRoute", self.getCrateRoute(1090),self.getCrateRoute(136),self.getCrateRoute(1910),self.getCrateRoute(1088),self.getCrateRoute(5157))
-
-        # self.canvasD.delete(self.poly)
-
-        # self.canvasD.create_rectangle(20, 50, 300, 100, outline="black", fill="red", width=2, stipple="gray50")
 
         self.canvasD.bind("<Key>", self.key)
         self.canvasD.bind("<Button-1>", self.callbackD)
@@ -313,7 +269,6 @@ class myAwesomeClass():
         return masterList
 
     def initRing(self,ringNum=0):
-        print("Inside initRing")
         self.canvasD.delete("all")
 
         self.myVList=self.masterList[ringNum][0]
@@ -403,14 +358,14 @@ class myAwesomeClass():
 
     #Simple test print out
     def printRtest(self, dIntList):
-        # print("Inside print2Test")
+        print("Inside print2Test")
         for sec in dIntList:
             sIndex=dIntList.index(sec)
-            # print("Section = ", sIndex)
+            print("Section = ", sIndex)
             for ring in sec:
                 rIndex=sec.index(ring)
-                # print("Ringnum = ", rIndex)
-                # print("listValue = ", dIntList[sIndex][rIndex])
+                print("Ringnum = ", rIndex)
+                print("listValue = ", dIntList[sIndex][rIndex])
 
     def getPidNumber(self,cobo, asad, aget, chan):
         #TODO: put this in a more global place
@@ -451,3 +406,23 @@ class myAwesomeClass():
         chan = asadRes
 
         return [cobo,asad,aget,chan]
+
+    def readXmlState(self):
+        xmlDict=self.doc
+        dIntList=self.dIntList #Enumerated detectors
+        for sec in dIntList:
+            sIndex=dIntList.index(sec)
+            localOnOffL=self.masterList[sIndex][3]
+
+            for ring in sec:
+                rIndex=sec.index(ring)
+
+                for det in ring:
+                    dIndex=ring.index(det)
+
+                    dNum=dIntList[sIndex][rIndex][dIndex]
+                    cobo,asad,aget,ch=self.getCrateRoute(dNum)
+                    readVal=getOptVal(xmlDict,cobo,asad,aget,ch,"isActive")
+                    localOnOffL[rIndex][dIndex]=readVal
+
+            self.masterList[sIndex][3]=localOnOffL
