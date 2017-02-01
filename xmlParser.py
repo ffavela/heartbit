@@ -5,14 +5,6 @@ def getXmlDoc(filename):
     with open(filename) as fd:
         doc = xmltodict.parse(fd.read())
 
-    print("The var as soon as it is read")
-    lRoute=getRoute(doc,0,0,0,56)
-    print("Route is ", lRoute)
-    leafVar=doc["Setup"]["Node"][1]\
-                ["Instance"][1]["AsAd"]\
-                [4]["Aget"][4]["channel"]\
-                [1]
-    print(leafVar)
     doc = getCheckedDict(doc) #Adapting the xmlvar to our standard
     return doc
 
@@ -124,11 +116,6 @@ def getRoute(docVar, cobo=0, asad=0, aget=0, ch=0):
     routeVar.append("channel")
     chanList=specificAget["channel"]
 
-    try:
-        chanIdx=getIdxOfID(chanList, ch)
-    except:
-        print("Error found here")
-
     chanIdx=getIdxOfID(chanList, ch)
 
     if chanIdx == -1:
@@ -148,22 +135,16 @@ def getIdxOfID(listOfOrderedDicts, idVal):
             return i
     return -1
 
-def getOptVal(xmlDict,cobo,asad,aget,ch,opt="isActive",pBool=False):
+def getOptVal(xmlDict,cobo,asad,aget,ch,opt="isActive"):
     if opt != "isActive":
         print("Option not implemented yet")
         return False
 
-    if pBool:
-        print("Got the signal")
     lRoute=getRoute(xmlDict,cobo,asad,aget,ch)
-    # print("lRoute = ", lRoute)
 
     routeBool=routeTest(lRoute)
 
     if routeBool:
-        # xmlDict=getUp2ChXD(self,xmlDict,onOffVal,cobo,asad,aget,ch):
-        if pBool:
-            print("In routeBool conditional")
         return True
 
     cInsIdx=lRoute[2] #The index in the Instance list for the CoBo
@@ -187,30 +168,17 @@ def getOptVal(xmlDict,cobo,asad,aget,ch,opt="isActive",pBool=False):
 
     if opt not in leaf:
         #By default is true if it made it up to here
-        if pBool:
-            print("Not in leaf option")
         return True
 
     #If not, we read it, it could be either true or false
     optionVal=leaf[opt]
 
-    if pBool:
-        print("optionVal = %s" % optionVal)
-        print("cobo, asad, aget, ch = ",cobo,asad,aget,ch)
-        print("lRoute = ", lRoute)
-        print("leaf = ", leaf)
-
     if optionVal == 'true':
-        if pBool:
-            print("Read optionVal as true")
-
         return True
 
     #For now hoping false is the other valid option (may not be in
     #other cases)
     # print("Found false case")
-    if pBool:
-        print("Returning False")
     return False
 
 def getCheckedDict(xmlDict):

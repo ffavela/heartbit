@@ -439,11 +439,7 @@ class myAwesomeClass():
 
                     dNum=dIntList[sIndex][rIndex][dIndex]
                     cobo,asad,aget,ch=self.getCrateRoute(dNum)
-                    pB=False
-                    if dNum == 56:
-                        print("dNum = %d"% dNum)
-                        pB=True
-                    readVal=getOptVal(xmlDict,cobo,asad,aget,ch,"isActive",pB)
+                    readVal=getOptVal(xmlDict,cobo,asad,aget,ch,"isActive")
                     localOnOffL[rIndex][dIndex]=readVal
 
             self.masterList[sIndex][3]=localOnOffL
@@ -464,12 +460,6 @@ class myAwesomeClass():
 
                     dNum=dIntList[sIndex][rIndex][dIndex]
                     cobo,asad,aget,ch=self.getCrateRoute(dNum)
-                    self.debugVar=False
-                    if dNum == 56:
-                        self.debugVar=True
-                        print("Inside writting part of %d" % dNum)
-                        print("cobo,asad,aget,ch = ", cobo,asad,aget,ch)
-                        print("The onOffVal is ", onOffVal)
                     xmlDict=self.getUp2ChXD(xmlDict,onOffVal,\
                                             cobo,asad,aget,ch)
 
@@ -505,9 +495,6 @@ class myAwesomeClass():
             xmlDict["Setup"]["Node"][cInsIdx]\
                   ["Instance"][coboIdx]["AsAd"][asadIdx]\
                   ["Aget"]=leaf
-            if self.debugVar:
-                print("getUp2ChXD first cond")
-                print(leaf)
 
         elif rVar[-2]=='AsAd':
             leaf=xmlDict["Setup"]["Node"][cInsIdx]\
@@ -525,10 +512,6 @@ class myAwesomeClass():
                   ["Instance"][coboIdx]["AsAd"][asadIdx]\
                   ["Aget"]=newLeaf
 
-            if self.debugVar:
-                print("getUp2ChXD second cond")
-                print(newLeaf)
-
         elif rVar[-1]=='channel':
             agetIdx=rVar[8]
 
@@ -542,9 +525,6 @@ class myAwesomeClass():
             xmlDict["Setup"]["Node"][cInsIdx]\
                   ["Instance"][coboIdx]["AsAd"][asadIdx]\
                   ["Aget"][agetIdx]["channel"] = leaf
-            if self.debugVar:
-                print("getUp2ChXD third cond")
-                print(leaf)
         else:
             agetIdx=rVar[8]
             chanIdx=rVar[10]
@@ -554,10 +534,5 @@ class myAwesomeClass():
                 ["Instance"][coboIdx]["AsAd"]\
                 [asadIdx]["Aget"][agetIdx]["channel"]\
                 [chanIdx]['isActive']=lVar['isActive']
-            if self.debugVar:
-                print("getUp2ChXD else")
-                print(lVar['isActive'])
-                print("Getting the route")
-                print(rVar)
 
         return xmlDict
