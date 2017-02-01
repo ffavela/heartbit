@@ -1,10 +1,18 @@
 import xmltodict
-import collections
+from collections import OrderedDict
 
 def getXmlDoc(filename):
-    with open('configure-cobomutant.xcfg') as fd:
+    with open(filename) as fd:
         doc = xmltodict.parse(fd.read())
 
+    print("The var as soon as it is read")
+    lRoute=getRoute(doc,0,0,0,56)
+    print("Route is ", lRoute)
+    leafVar=doc["Setup"]["Node"][1]\
+                ["Instance"][1]["AsAd"]\
+                [4]["Aget"][4]["channel"]\
+                [1]
+    print(leafVar)
     doc = getCheckedDict(doc) #Adapting the xmlvar to our standard
     return doc
 
@@ -116,6 +124,11 @@ def getRoute(docVar, cobo=0, asad=0, aget=0, ch=0):
     routeVar.append("channel")
     chanList=specificAget["channel"]
 
+    try:
+        chanIdx=getIdxOfID(chanList, ch)
+    except:
+        print("Error found here")
+
     chanIdx=getIdxOfID(chanList, ch)
 
     if chanIdx == -1:
@@ -127,28 +140,30 @@ def getRoute(docVar, cobo=0, asad=0, aget=0, ch=0):
 
     return routeVar
 
-def getIdxOfID(listOfOrderedDicts, idNum):
-    idNum=str(idNum)
+def getIdxOfID(listOfOrderedDicts, idVal):
+    idVal=str(idVal)
     for e,i in zip(listOfOrderedDicts,range(len(listOfOrderedDicts))):
         newVar=e["@id"]
-        if idNum == newVar:
+        if idVal == newVar:
             return i
     return -1
 
-def getOptVal(xmlDict,cobo,asad,aget,ch,opt="isActive"):
+def getOptVal(xmlDict,cobo,asad,aget,ch,opt="isActive",pBool=False):
     if opt != "isActive":
         print("Option not implemented yet")
         return False
 
+    if pBool:
+        print("Got the signal")
     lRoute=getRoute(xmlDict,cobo,asad,aget,ch)
+    # print("lRoute = ", lRoute)
 
-    if "Aget" not in lRoute or "Aget" == lRoute[-1]:
-        #It cannot be "on" if Aget is not present Or there is no index
-        #to get to it (blue)
-        return False
+    routeBool=routeTest(lRoute)
 
-    #channel was the last appended but no indeces then it's in blue
-    if "channel" == lRoute[-1]:
+    if routeBool:
+        # xmlDict=getUp2ChXD(self,xmlDict,onOffVal,cobo,asad,aget,ch):
+        if pBool:
+            print("In routeBool conditional")
         return True
 
     cInsIdx=lRoute[2] #The index in the Instance list for the CoBo
@@ -172,16 +187,30 @@ def getOptVal(xmlDict,cobo,asad,aget,ch,opt="isActive"):
 
     if opt not in leaf:
         #By default is true if it made it up to here
+        if pBool:
+            print("Not in leaf option")
         return True
 
     #If not, we read it, it could be either true or false
     optionVal=leaf[opt]
 
+    if pBool:
+        print("optionVal = %s" % optionVal)
+        print("cobo, asad, aget, ch = ",cobo,asad,aget,ch)
+        print("lRoute = ", lRoute)
+        print("leaf = ", leaf)
+
     if optionVal == 'true':
+        if pBool:
+            print("Read optionVal as true")
+
         return True
 
     #For now hoping false is the other valid option (may not be in
     #other cases)
+    # print("Found false case")
+    if pBool:
+        print("Returning False")
     return False
 
 def getCheckedDict(xmlDict):
@@ -205,6 +234,7 @@ def getCheckedDict(xmlDict):
 
     coboIdx=getIdxOfID(xmlDict["Setup"]["Node"],'CoBo')
     subXmlDict=xmlDict["Setup"]["Node"][coboIdx]
+    print("Stuff into xmlRecursive...", type(subXmlDict))
     subXmlDict=xmlRecursiveListChecked(subXmlDict)
 
     xmlDict["Setup"]["Node"][coboIdx]=subXmlDict
@@ -214,18 +244,31 @@ def getCheckedDict(xmlDict):
 def xmlRecursiveListChecked(xmlDict):
     #Iterative recursive function for the rest of the dictionary
     #structure
-    if type(xmlDict) is not collections.OrderedDict:
+    if type(xmlDict) is not OrderedDict:
+        print("Found weird part")
+        print(xmlDict)
+
         return xmlDict
 
     for e in xmlDict:
         myType=type(xmlDict[e])
-        if myType is collections.OrderedDict:
+        if myType is OrderedDict:
             xmlDict[e] = [xmlDict[e]]
         elif myType is str:
             continue
 
         dictList=xmlDict[e]
         for subDict,i in zip(dictList, range(len(dictList))):
+            # print("Recursive part", i)
             xmlDict[e][i]=xmlRecursiveListChecked(subDict)
 
     return xmlDict
+
+def routeTest(lRoute):
+    if "Aget" not in lRoute or "Aget" == lRoute[-1]:
+        #It is "on" if there is no index to get to it (blue)
+        return True
+
+    #channel was the last appended but no indeces then it's in blue
+    if "channel" == lRoute[-1]:
+        return True
