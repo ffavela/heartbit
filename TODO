@@ -1,0 +1,13 @@
+- Ignore the fpn (fixed pattern noise) channels; 11 22 45 56.
+
+- Make the program have tabs, or at least buttons to change mode into "physical" module.
+
+- Think about the dual gain implementation... talk to Giuseppe of this.
+
+- Add functionality for other options. (Think about which ones)
+
+- Add a color just for selection, not only to turn off and on inmediately.
+
+- On every zone put a label on the rings.
+
+- Do also a connection interface between the detector and get electronics.
