@@ -77,6 +77,10 @@ class myAwesomeClass():
         self.canvasU.grid(row = 0, column = 0)
         self.canvasU.create_image(306,77, image=self.photoT)
 
+        self.canvas_id= self.canvasU.create_text(200,10,anchor="nw")
+        self.canvasU.itemconfig(self.canvas_id,text="Chimera detector")
+        # canvas_id = canvas.create_text(10, 10, anchor="nw")
+
         self.canvasU.bind("<Key>", self.key)
         self.canvasU.bind("<Button-1>", self.callback)
         self.canvasU.pack()
@@ -94,11 +98,8 @@ class myAwesomeClass():
         # self.printRtest(self.dIntList)
 
         self.readXmlState()
-
-        # print("onOffList")
-        # print(self.onOffList)
-
-        getRoute(self.doc, 1,3,1,5)
+        #Redrawing zone 1 so it gets the xml state
+        self.drawZone1()
 
         self.dummyVar=getOptVal(self.doc,1,3,1,5, "isActive")
 
@@ -109,34 +110,19 @@ class myAwesomeClass():
         # self.canvasD.delete(self.arc)
 
     def callbackD(self, event):
-        # print("Lower canvas")
-        # print("clicked at", e
-              # vent.x, event.y)
         self.myPoint=Point(event.x, event.y)
-        # if self.shapelyPoly.contains(self.myPoint):
-        #     print("Point inside the polygon!!")
         indexList=self.checkEventInPolyList(event.x, event.y)
-        # print("Index list is: ",indexList)
-        # print("b4 if len(self.poly4DrawList)",len(self.poly4DrawList))
         if indexList != []:
             self.redrawRing(indexList)
-        # self.genRandInt()
-        # print("getPolySides(%d) = %d" % (self.myRandInt, self.getPolySides(self.myRandInt)))
 
+        self.writeRegionInfo(self.listIndex)
 
     def callback(self, event):
-        # print("Upper canvas")
         x=event.x
         y=event.y
-        # print("clicked at", x, y)
         region=self.ringRegion(x,y)
         self.listIndex=region
-        # print("region = ", region)
-
-        # self.genRandInt()
-        self.initRing(region)
-
-        # print("getPolySides(%d) = %d" % (self.myRandInt, self.getPolySides(self.myRandInt)))
+        self.initRing(self.listIndex)
 
     def key(self, event):
         print("pressed", repr(event.char))
@@ -180,7 +166,6 @@ class myAwesomeClass():
             vPoints[2]=[(R+dR)*cos(ang+dAng),(R+dR)*sin(ang+dAng)]
             vPoints[3]=[R*cos(ang+dAng),R*sin(ang+dAng)]
             ang+=dAng
-
             localVertexList.append(vPoints)
         return localVertexList
 
@@ -298,6 +283,8 @@ class myAwesomeClass():
 
         self.polyDrawnL=self.drawPolygons(self.poly4DrawList)
 
+        self.writeRegionInfo(ringNum)
+
 
     def redrawRing(self, indexList):
         self.canvasD.delete("all")
@@ -347,30 +334,16 @@ class myAwesomeClass():
     #     widget.configure(foreground=color)
 
     def detect2Num(self,detectSet):
-        # print("Inside detect2Num")
         dNumber=0
-        # print("lenStuff = ",len(detectSet))
         dIntList=[[[0 for d in ring] for ring in section[1]]\
                   for section in detectSet]
-        # print("After the dIntList generation")
         for sIndex in range(len(detectSet)):
-            # sIndex=detectSet.index(section)
-            # print("sIndex = ", sIndex)
             section=detectSet[sIndex][1]#Using the polyList
-            # print("Section len = ", len(section))
             for rIndex in range(len(section)):
-                # rIndex=section.index(ring)
-                # print("rIndex = ", rIndex)
                 ring=section[rIndex]
-                # print("ring len", len(ring))
                 for dIndex in range(len(ring)):
-                    # dIndex=ring.index(detect)
-
-                    # print("dIndex = ", dIndex)
                     dIntList[sIndex][rIndex][dIndex]=dNumber
                     dNumber+=1
-                    # print("dNumber = ", dNumber)
-        # print("dNumber = ", dNumber)
         return dIntList
 
     #Simple test print out
@@ -536,3 +509,13 @@ class myAwesomeClass():
                 [chanIdx]['isActive']=lVar['isActive']
 
         return xmlDict
+
+    def drawZone1(self):
+        #Sending data [0,0] so it redraws the first zone
+        self.redrawRing([0,0])
+        self.writeRegionInfo(0)
+
+    def writeRegionInfo(self, indexInfo):
+        self.canvas_idD= self.canvasD.create_text(100,20)
+        textVar="region "+str(indexInfo)
+        self.canvasD.itemconfig(self.canvas_idD, text=textVar)
