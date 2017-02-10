@@ -33,6 +33,7 @@ class myAwesomeClass():
         self.onOffList=[]
 
         self.dIntList=[]
+        self.pidList=[]
         # master.iconbitmap(r"heart.png")
 
         # self.doc=getXmlDoc('configure-cobomutant.xcfg')
@@ -95,7 +96,8 @@ class myAwesomeClass():
         self.initRing(0)
 
         self.dIntList=self.detect2Num(self.masterList)
-        # self.printRtest(self.dIntList)
+        self.pidList=self.detect2Pid(self.masterList)
+        # self.printRtest(self.dIntList,self.pidList)
 
         self.readXmlState()
         #Redrawing zone 1 so it gets the xml state
@@ -115,7 +117,8 @@ class myAwesomeClass():
         if indexList != []:
             self.redrawRing(indexList)
 
-        self.writeRegionInfo(self.listIndex)
+            print("Global listIndex is = ", self.listIndex)
+            self.writeRegionInfo(self.listIndex)
 
     def callback(self, event):
         x=event.x
@@ -279,6 +282,8 @@ class myAwesomeClass():
         self.poly4DrawList=self.masterList[ringNum][2]
 
         self.onOffList=self.masterList[ringNum][3]
+        if ringNum == 0:
+            print("firstVal", self.onOffList[0][0])
         # print("initRing, self.onOffList = ",self.onOffList)
 
         self.polyDrawnL=self.drawPolygons(self.poly4DrawList)
@@ -346,8 +351,23 @@ class myAwesomeClass():
                     dNumber+=1
         return dIntList
 
+    def detect2Pid(self,detectSet):
+        pidV=0
+        pidList=[[[0 for d in ring] for ring in section[1]]\
+                  for section in detectSet]
+        for sIndex in range(len(detectSet)):
+            section=detectSet[sIndex][1]#Using the polyList
+            for rIndex in range(len(section)):
+                ring=section[rIndex]
+                for dIndex in range(len(ring)):
+                    if self.checkFpn(pidV):
+                        pidV+=1 #if fpn next val won't be
+                    pidList[sIndex][rIndex][dIndex]=pidV
+                    pidV+=1
+        return pidList
+
     #Simple test print out
-    def printRtest(self, dIntList):
+    def printRtest(self, dIntList,pidList):
         print("Inside print2Test")
         for sec in dIntList:
             sIndex=dIntList.index(sec)
@@ -356,6 +376,7 @@ class myAwesomeClass():
                 rIndex=sec.index(ring)
                 print("Ringnum = ", rIndex)
                 print("listValue = ", dIntList[sIndex][rIndex])
+                print("Using pidList = ", pidList[sIndex][rIndex])
 
     def getPidNumber(self,cobo, asad, aget, chan):
         #TODO: put this in a more global place
@@ -399,40 +420,38 @@ class myAwesomeClass():
 
     def readXmlState(self):
         xmlDict=self.doc
-        dIntList=self.dIntList #Enumerated detectors
-        for sec in dIntList:
-            sIndex=dIntList.index(sec)
+        pidList=self.pidList
+        for sec in pidList:
+            sIndex=pidList.index(sec)
             localOnOffL=self.masterList[sIndex][3]
-
             for ring in sec:
                 rIndex=sec.index(ring)
-
                 for det in ring:
                     dIndex=ring.index(det)
 
-                    dNum=dIntList[sIndex][rIndex][dIndex]
-                    cobo,asad,aget,ch=self.getCrateRoute(dNum)
+                    pidV=pidList[sIndex][rIndex][dIndex]
+                    cobo,asad,aget,ch=self.getCrateRoute(pidV)
                     readVal=getOptVal(xmlDict,cobo,asad,aget,ch,"isActive")
+                    if pidV == 0 or pidV == 1:
+                        print("pidV==0 or 1 so readVal = ", readVal)
                     localOnOffL[rIndex][dIndex]=readVal
 
             self.masterList[sIndex][3]=localOnOffL
 
     def write2Dict(self):
         xmlDict=self.doc
-        dIntList=self.dIntList #Enumerated detectors
-        for sec in dIntList:
-            sIndex=dIntList.index(sec)
+        pidList=self.pidList #Enumerated detectors by pid
+        for sec in pidList:
+            sIndex=pidList.index(sec)
             localOnOffL=self.masterList[sIndex][3]
-
             for ring in sec:
                 rIndex=sec.index(ring)
-
                 for det in ring:
                     dIndex=ring.index(det)
                     onOffVal=localOnOffL[rIndex][dIndex]
 
-                    dNum=dIntList[sIndex][rIndex][dIndex]
-                    cobo,asad,aget,ch=self.getCrateRoute(dNum)
+                    pidV=pidList[sIndex][rIndex][dIndex]
+                    cobo,asad,aget,ch=self.getCrateRoute(pidV)
                     xmlDict=self.getUp2ChXD(xmlDict,onOffVal,\
                                             cobo,asad,aget,ch)
 
@@ -513,9 +532,18 @@ class myAwesomeClass():
     def drawZone1(self):
         #Sending data [0,0] so it redraws the first zone
         self.redrawRing([0,0])
+        self.listIndex=0
         self.writeRegionInfo(0)
 
     def writeRegionInfo(self, indexInfo):
         self.canvas_idD= self.canvasD.create_text(100,20)
         textVar="region "+str(indexInfo)
         self.canvasD.itemconfig(self.canvas_idD, text=textVar)
+
+    #Checks if a pid end up in an fixed pattern noise channel (fpn)
+    def checkFpn(self, pid):
+        fpnChan=[11,22,45,56]
+        cobo,asad,aget,ch=self.getCrateRoute(pid)
+        if ch in fpnChan:
+            return True
+        return False

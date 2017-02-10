@@ -1,13 +1,28 @@
-- Ignore the fpn (fixed pattern noise) channels; 11 22 45 56.
+- Ignore the fpn (fixed pattern noise) channels; 11 22 45 56. workingOnThis
 
-- Make the program have tabs, or at least buttons to change mode into "physical" module.
+- Make the program have tabs, or at least buttons to change mode into
+  "physical" module.
 
-- Think about the dual gain implementation... talk to Giuseppe of this.
+- Think about the dual gain implementation... talk to Giuseppe of
+  this.
 
 - Add functionality for other options. (Think about which ones)
 
-- Add a color just for selection, not only to turn off and on inmediately.
+- Add a color just for selection, not only to turn off and on
+  inmediately.
 
-- On every zone put a label on the rings.
+- On every zone put a label on the rings. DONE
 
-- Do also a connection interface between the detector and get electronics.
+- Do also a connection interface between the detector and get
+  electronics.
+
+- Put a menu for opening a file.
+
+
+
+BUGS
+
+- Zone 0 display sometimes converts to zone 10. SQUASHED
+
+- The very first polygon state doesn't appear to be displayed
+  correctly.
