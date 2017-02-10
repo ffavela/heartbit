@@ -115,9 +115,12 @@ class myAwesomeClass():
         self.myPoint=Point(event.x, event.y)
         indexList=self.checkEventInPolyList(event.x, event.y)
         if indexList != []:
+            print("zoneIndex = ", self.listIndex)
+            print("indexList = ", indexList)
+            localOnOffL=self.masterList[self.listIndex][3]
+            onOffVal=localOnOffL[indexList[0]][indexList[1]]
+            print("ondOffVal = ", onOffVal)
             self.redrawRing(indexList)
-
-            print("Global listIndex is = ", self.listIndex)
             self.writeRegionInfo(self.listIndex)
 
     def callback(self, event):
@@ -290,7 +293,6 @@ class myAwesomeClass():
 
         self.writeRegionInfo(ringNum)
 
-
     def redrawRing(self, indexList):
         self.canvasD.delete("all")
         self.polyDrawnL=self.drawPolygons(self.poly4DrawList, indexList)
@@ -432,8 +434,6 @@ class myAwesomeClass():
                     pidV=pidList[sIndex][rIndex][dIndex]
                     cobo,asad,aget,ch=self.getCrateRoute(pidV)
                     readVal=getOptVal(xmlDict,cobo,asad,aget,ch,"isActive")
-                    if pidV == 0 or pidV == 1:
-                        print("pidV==0 or 1 so readVal = ", readVal)
                     localOnOffL[rIndex][dIndex]=readVal
 
             self.masterList[sIndex][3]=localOnOffL
@@ -531,8 +531,11 @@ class myAwesomeClass():
 
     def drawZone1(self):
         #Sending data [0,0] so it redraws the first zone
-        self.redrawRing([0,0])
         self.listIndex=0
+        #Twice so the 0,0 polygon stays the same, not very elegant but
+        #it works ;-P
+        self.redrawRing([0,0])
+        self.redrawRing([0,0])
         self.writeRegionInfo(0)
 
     def writeRegionInfo(self, indexInfo):

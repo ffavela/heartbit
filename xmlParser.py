@@ -144,9 +144,6 @@ def getOptVal(xmlDict,cobo,asad,aget,ch,opt="isActive"):
 
     routeBool=routeTest(lRoute)
 
-    if routeBool:
-        return True
-
     cInsIdx=lRoute[2] #The index in the Instance list for the CoBo
     coboIdx=lRoute[4] #The index in the CoBo list for cobo
     asadIdx=lRoute[6] #...

@@ -25,4 +25,4 @@ BUGS
 - Zone 0 display sometimes converts to zone 10. SQUASHED
 
 - The very first polygon state doesn't appear to be displayed
-  correctly.
+  correctly. SQUASHED
