@@ -10,6 +10,7 @@ class myAwesomeClass():
 
         master.wm_title("Heartbit")
         self.debugVar=False
+        self.boolEnum=True
         self.sideList=[16,24,32,40,40,48,48,48,48,32,32]
         self.listIndex=0
         self.myRandInt=0
@@ -242,10 +243,14 @@ class myAwesomeClass():
             for poly in poly4DrawList[i]:
                 polyIndex=poly4DrawList[i].index(poly)
                 color=getColor(i,polyIndex,indexStuff)
+                myPol=self.canvasD.create_polygon(poly,\
+                                                  fill=color,\
+                                                  stipple="gray50",\
+                                                  outline="#f12",\
+                                                  width=2)
+                polyDrawnL[i].append(myPol)
 
-                polyDrawnL[i].append(self.canvasD.create_polygon(poly,fill=color,stipple="gray50", outline="#f12", width=2))
-
-        # print("onOffList")
+        # Print("onOffList")
         # print(self.onOffList)
 
         return polyDrawnL
@@ -292,10 +297,15 @@ class myAwesomeClass():
         self.polyDrawnL=self.drawPolygons(self.poly4DrawList)
 
         self.writeRegionInfo(ringNum)
+        if self.boolEnum:
+            self.writeEnum(self.shapelyPolyList)
+
 
     def redrawRing(self, indexList):
         self.canvasD.delete("all")
         self.polyDrawnL=self.drawPolygons(self.poly4DrawList, indexList)
+        if self.boolEnum:
+            self.writeEnum(self.shapelyPolyList)
 
     def checkEventInPolyList(self,xVal,yVal):
         #Add an argument to shapelyPolyList and adapt it
@@ -550,3 +560,11 @@ class myAwesomeClass():
         if ch in fpnChan:
             return True
         return False
+
+    def writeEnum(self, shapelyPolyList):
+        for ring in shapelyPolyList:
+            numOfPoly=len(ring)
+            for poly,i in zip(ring,range(numOfPoly)):
+                pCent=list(poly.centroid.coords)[0]
+                textObj=self.canvasD.create_text(pCent[0],pCent[1])
+                self.canvasD.itemconfig(textObj, text=str(i))
