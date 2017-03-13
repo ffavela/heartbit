@@ -1,4 +1,10 @@
-from tkinter import *
+import sys
+#Checking python version (either 2 or 3)
+if sys.version_info[0] == 2:
+    from Tkinter import *
+else:#python 3 case
+    from tkinter import *
+
 from shapely.geometry import Polygon,MultiPoint,Point
 import random
 from math import pi,sin,cos

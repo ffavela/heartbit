@@ -3,6 +3,9 @@ configuration files for either Chimera or FARCOS detectors. It is
 intended to be used through python 3.x future implementation will
 include python 2.x.
 
+Make sure that the folloing packages are installed the python-tk,
+python-xmltodict and python-shapely packages in order to run it.
+
 In order to run you need a resources directory, you can download it
 from: https://drive.google.com/open?id=0B2znJ2THUGDib2w1bmE2Yk0zSHM
 
