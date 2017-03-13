@@ -296,8 +296,9 @@ class myAwesomeClass():
         self.poly4DrawList=self.masterList[ringNum][2]
 
         self.onOffList=self.masterList[ringNum][3]
-        if ringNum == 0:
-            print("firstVal", self.onOffList[0][0])
+        # if ringNum == 0:
+            # print("firstVal", self.onOffList[0][0])
+
         # print("initRing, self.onOffList = ",self.onOffList)
 
         self.polyDrawnL=self.drawPolygons(self.poly4DrawList)

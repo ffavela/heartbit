@@ -217,9 +217,11 @@ def xmlRecursiveListChecked(xmlDict):
 
     for e in xmlDict:
         myType=type(xmlDict[e])
+        # print("myType = ", myType)
         if myType is OrderedDict:
             xmlDict[e] = [xmlDict[e]]
-        elif myType is str:
+        # elif myType is str: #there is a <type 'unicode'> in python2...
+        else:
             continue
 
         dictList=xmlDict[e]
