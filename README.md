@@ -1,9 +1,8 @@
 Heartbit is a simple GUI interface for quickly editing xml
 configuration files for either Chimera or FARCOS detectors. It is
-intended to be used through python 3.x future implementation will
-include python 2.x.
+intended to be used through python 3.x and 2.x.
 
-Make sure that the folloing packages are installed the python-tk,
+Make sure that the following packages are installed the python-tk,
 python-xmltodict and python-shapely packages in order to run it.
 
 In order to run you need a resources directory, you can download it
