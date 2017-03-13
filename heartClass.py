@@ -38,7 +38,7 @@ class myAwesomeClass():
         # master.iconbitmap(r"heart.png")
 
         # self.doc=getXmlDoc('configure-cobomutant.xcfg')
-        self.doc=getXmlDoc('modifiedXml2.xml')
+        self.doc=getXmlDoc('resources/modifiedXml2.xml')
 
         self.var=self.doc['Setup']['@id'] # == u'Conditions'
 
@@ -145,7 +145,7 @@ class myAwesomeClass():
         # print(myXmlString)
 
         #Writing to file
-        outFileName="modifiedXml2.xml"
+        outFileName="resources/modifiedXml2.xml"
         print("\nWriting to %s \n" % outFileName)
 
         with open(outFileName, "w") as text_file:

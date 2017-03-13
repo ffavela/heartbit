@@ -1,4 +1,4 @@
-- Ignore the fpn (fixed pattern noise) channels; 11 22 45 56. workingOnThis
+- Ignore the fpn (fixed pattern noise) channels; 11 22 45 56. DONE
 
 - Make the program have tabs, or at least buttons to change mode into
   "physical" module.
@@ -18,7 +18,9 @@
 
 - Put a menu for opening a file.
 
+- Enumerating detectors. Done
 
+- Implement the other options for each channel, print them at least.
 
 BUGS
 
