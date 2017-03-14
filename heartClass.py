@@ -208,10 +208,11 @@ class myAwesomeClass():
     def ringRegion(self,x,y):
         divNum=11
         deltaPos=self.UW/divNum
-        for i in range(divNum+1):
-            if x < i*deltaPos:
-                return 10-(i-1)
-
+        secList=[79,158,219,271,322,376,426,480,533,580,611]
+        for e,i in zip(secList,range(len(secList))):
+            if x < e:
+                return 9-(i-1)
+                
     def makeShapelyPolyList(self,myVList):
         myShapelyPolyList=[[] for e in myVList]
         for i in range(len(myVList)):
