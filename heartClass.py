@@ -212,6 +212,7 @@ class myAwesomeClass():
         for e,i in zip(secList,range(len(secList))):
             if x < e:
                 return 9-(i-1)
+        return 0 #If all fails send the tiny ring
                 
     def makeShapelyPolyList(self,myVList):
         myShapelyPolyList=[[] for e in myVList]
