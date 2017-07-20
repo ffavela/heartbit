@@ -22,9 +22,14 @@
 
 - Implement the other options for each channel, print them at least.
 
+- Add option for turning off and on the Cesium. (Re think the
+  structure of the program...)
+
 BUGS
 
 - Zone 0 display sometimes converts to zone 10. SQUASHED
 
 - The very first polygon state doesn't appear to be displayed
   correctly. SQUASHED
+
+- Zone 0 on the right side (when clicked) displays an error. SQUASHED

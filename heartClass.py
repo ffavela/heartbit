@@ -18,6 +18,7 @@ class myAwesomeClass():
         self.debugVar=False
         self.boolEnum=True
         self.sideList=[16,24,32,40,40,48,48,48,48,32,32]
+        self.secList=[79,158,219,271,322,376,426,480,533,580,611]
         self.listIndex=0
         self.myRandInt=0
         self.myPoint=(0,0)
@@ -129,6 +130,7 @@ class myAwesomeClass():
             print("ondOffVal = ", onOffVal)
             self.redrawRing(indexList)
             self.writeRegionInfo(self.listIndex)
+            self.writeDetectInfo(self.listIndex,indexList)
 
     def callback(self, event):
         x=event.x
@@ -206,14 +208,12 @@ class myAwesomeClass():
         return p4DList
 
     def ringRegion(self,x,y):
-        divNum=11
-        deltaPos=self.UW/divNum
-        secList=[79,158,219,271,322,376,426,480,533,580,611]
+        secList=self.secList
         for e,i in zip(secList,range(len(secList))):
             if x < e:
                 return 9-(i-1)
         return 0 #If all fails send the tiny ring
-                
+
     def makeShapelyPolyList(self,myVList):
         myShapelyPolyList=[[] for e in myVList]
         for i in range(len(myVList)):
@@ -560,6 +560,17 @@ class myAwesomeClass():
     def writeRegionInfo(self, indexInfo):
         self.canvas_idD= self.canvasD.create_text(100,20)
         textVar="region "+str(indexInfo)
+        self.canvasD.itemconfig(self.canvas_idD, text=textVar)
+
+    def writeDetectInfo(self, indexInfo,indexList):
+        pidList=self.pidList
+        sIndex=indexInfo
+        rIndex,dIndex=indexList
+        pidV=pidList[sIndex][rIndex][dIndex]
+        self.canvas_idD= self.canvasD.create_text(100,50)
+        # textVar="GET route "+str(sIndex)+" "+str(rIndex)+" "+str(dIndex)
+        cobo,asad,aget,chan=self.getCrateRoute(pidV)
+        textVar="GET route "+str([cobo,asad,aget,chan])
         self.canvasD.itemconfig(self.canvas_idD, text=textVar)
 
     #Checks if a pid end up in an fixed pattern noise channel (fpn)
