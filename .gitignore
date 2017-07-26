@@ -14,3 +14,5 @@ canvasClickEx.py
 *.pyc
 *.xml
 *.xcfg
+
+*~
