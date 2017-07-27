@@ -24,18 +24,28 @@ class myCrateClass():
         # self.listIndex=0
         # self.myRandInt=0
         # self.myPoint=(0,0)
-        self.coboW=86
-        self.coboH=303
+        self.coboW=50
+        self.coboH=173
+        self.shift=[15,85]
+
+        self.asadConW=5
+        self.asadConH=48
 
         self.coboPolyD={}
 
 
-        self.W=800
+        myAsadCoordsList=self.getAsadCon(1,1)
+
+        print(myAsadCoordsList)
+
+        self.myAsadConPoly=self.getPolyFromList(myAsadCoordsList)
+
+        self.W=850
         self.H=750
         self.center=[int(self.W/2),int(self.H/2)]
         self.BigR=int(min(self.W,self.H)/2)
 
-        self.UW=698
+        self.UW=750
         self.UH=323
 
         # self.vList=[]
@@ -64,6 +74,10 @@ class myCrateClass():
 
         self.cobosIDXs=[0,1,2,5]
         self.coboPolyD=self.getCoboPolyD()
+        self.asadsConDCoords=self.getAsadsConDCoords()
+
+        self.asadsPolyListDForAllCobos=\
+        self.getAsadsPolyListDForAllCobos(self.asadsConDCoords)
 
         leftFrame = Frame(master)
         leftFrame.pack(side=LEFT)
@@ -132,7 +146,7 @@ class myCrateClass():
         self.canvasU= Canvas(rUpFrame, bg="white", width=self.UW, height=self.UH)
 
         self.canvasU.grid(row = 0, column = 0)
-        self.canvasU.create_image(346,160, image=self.photoC)
+        self.canvasU.create_image(360,170, image=self.photoC)
 
         self.canvas_id= self.canvasU.create_text(200,10,anchor="nw")
 
@@ -223,11 +237,23 @@ class myCrateClass():
         myPoint=Point(x,y)
         # coboPoly=self.coboPoly
 
+        myAsadConPoly=self.myAsadConPoly
         coboPolyD=self.coboPolyD
+
         for coboKey in coboPolyD:
             coboPoly=coboPolyD[coboKey]
             if coboPoly.contains(myPoint):
                 print("Inside the COBO {}!!".format(coboKey))
+                # Fetching the corresponding list for the asadsD
+
+                asadsConPolyL=self.asadsPolyListDForAllCobos[coboKey]
+                for asadsConL in asadsConPolyL:
+                    # print(asadsConL)
+                    if asadsConL.contains(myPoint):
+                        print("###############################")
+                        print("Inside the asad polygon!!!")
+                        print("###############################")
+
                 break
 
         print(x,y)
@@ -485,16 +511,18 @@ class myCrateClass():
 
         return multiRingList
 
-    def getBoxList(self,shift):
+    def getBoxList(self,coboIdx):
+        shiftX,shiftY=self.shift
         coboW = self.coboW
         coboH = self.coboH
 
+        shiftX+=coboIdx*coboW
         boxList=[[] for i in range(4)]
 
-        boxList[0]=[shift,0]
-        boxList[1]=[shift,coboH]
-        boxList[2]=[shift+coboW,coboH]
-        boxList[3]=[shift+coboW,0]
+        boxList[0]=[shiftX,shiftY]
+        boxList[1]=[shiftX,shiftY+coboH]
+        boxList[2]=[shiftX+coboW,shiftY+coboH]
+        boxList[3]=[shiftX+coboW,shiftY]
 
         return boxList
 
@@ -731,8 +759,8 @@ class myCrateClass():
                 textObj=self.canvasD.create_text(pCent[0],pCent[1])
                 self.canvasD.itemconfig(textObj, text=str(i))
 
-    def createCoboPoly(self,shift=176):
-        coboPolVertex=self.getBoxList(shift)
+    def createCoboPoly(self,coboIdx):
+        coboPolVertex=self.getBoxList(coboIdx)
         convexPolyPoints=list(MultiPoint(coboPolVertex).convex_hull.exterior.coords)
         shapelyPolygon=Polygon(convexPolyPoints)
         return shapelyPolygon
@@ -742,7 +770,84 @@ class myCrateClass():
         coboW=self.coboW
         coboPolyD={}
         for idx in idxList:
-            coboPoly=self.createCoboPoly(coboW*idx)
+            coboPoly=self.createCoboPoly(idx)
             coboPolyD[idx]=coboPoly
 
         return coboPolyD
+
+    def getAsadCon(self,coboIdx,asadIdx):
+        shiftX,shiftY=self.shift
+        coboW = self.coboW
+        coboH = self.coboH
+
+        asadW = self.asadConW
+        asadH = self.asadConH
+
+        shiftX+=coboIdx*coboW
+
+        if asadIdx in [0,1]:
+            shiftY+=34
+        else: #[2,3]
+            shiftY+=107
+
+        if asadIdx in [1,3]:
+            shiftX+=15
+        else: #[0,2]
+            shiftX+=29
+
+        asadCoords=[[] for i in range(4)]
+
+        asadCoords[0]=[shiftX,shiftY]
+        asadCoords[1]=[shiftX,shiftY+asadH]
+        asadCoords[2]=[shiftX+asadW,shiftY+asadH]
+        asadCoords[3]=[shiftX+asadW,shiftY]
+
+        return asadCoords
+
+    def getPolyFromList(self,coordsList):
+        convexPolyPoints=list(MultiPoint(coordsList).convex_hull.exterior.coords)
+        shapelyPolygon=Polygon(convexPolyPoints)
+        return shapelyPolygon
+
+    def getAsadsPolyListDForAllCobos(self,asadsConDCoords):
+        asadsConDCoords=self.asadsConDCoords
+        asadsPolyListDForAllCobos={}
+        for coboKey in asadsConDCoords:
+            asadsPolyListDForAllCobos[coboKey]=self.getAsadsPolyListForCobo(coboKey)
+
+        return asadsPolyListDForAllCobos
+
+    def getAsadsPolyListForCobo(self,coboKey):
+        asadsConDCoords=self.asadsConDCoords
+        localCoordL=asadsConDCoords[coboKey]
+        asadsPolyListForCobo=[]
+        for asadCoord in localCoordL:
+            myAsadConPoly=self.getPolyFromList(asadCoord)
+            asadsPolyListForCobo.append(myAsadConPoly)
+
+        return asadsPolyListForCobo
+
+
+    def getLocalAsadConL(self,coboIdx):
+        localAsadConL=[]
+
+        for asadIdx in range(4):
+            newAsadCon=self.getAsadCon(coboIdx,asadIdx)
+            localAsadConL.append(newAsadCon)
+
+        return localAsadConL
+
+    def getAsadsConDCoords(self):
+        coboIdxL=self.cobosIDXs
+        asadsConD={}
+        for coboIdx in coboIdxL:
+            asadsConD[coboIdx]=self.getLocalAsadConL(coboIdx)
+        return asadsConD
+
+    def getAsadsConDPoly(self):
+        asadsConDPoly={}
+        asadsConD=self.asadsConD
+        for asadsConKey in asadsConD:
+            coordsList=asadsConD[asadsConKey]
+            asadsConDPoly[asadsConKey]=self.getPolyFromList(coordsList)
+        return asadsConDPoly
