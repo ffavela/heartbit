@@ -38,7 +38,7 @@ class myCrateClass():
 
         print(myAsadCoordsList)
 
-        self.myAsadConPoly=self.getPolyFromList(myAsadCoordsList)
+        self.myAsadConShapelyPoly=self.getShapelyPolyFromList(myAsadCoordsList)
 
         self.W=850
         self.H=750
@@ -153,6 +153,8 @@ class myCrateClass():
 
         self.canvasU.itemconfig(self.canvas_id,text="Crate and COBOs")
 
+        self.drawnPol=self.drawPolygons([[myAsadCoordsList]])
+
 
         # #The left down image left
         self.photoA = PhotoImage(file="resources/asad.png")
@@ -237,7 +239,7 @@ class myCrateClass():
         myPoint=Point(x,y)
         # coboPoly=self.coboPoly
 
-        myAsadConPoly=self.myAsadConPoly
+        myAsadConShapelyPoly=self.myAsadConShapelyPoly
         coboPolyD=self.coboPolyD
 
         for coboKey in coboPolyD:
@@ -389,8 +391,9 @@ class myCrateClass():
         for i in range(len(poly4DrawList)):
             for poly in poly4DrawList[i]:
                 polyIndex=poly4DrawList[i].index(poly)
-                color=getColor(i,polyIndex,indexStuff)
-                myPol=self.canvasD.create_polygon(poly,\
+                color="green"
+                # color=getColor(i,polyIndex,indexStuff)
+                myPol=self.canvasU.create_polygon(poly,\
                                                   fill=color,\
                                                   stipple="gray50",\
                                                   outline="#f12",\
@@ -804,7 +807,7 @@ class myCrateClass():
 
         return asadCoords
 
-    def getPolyFromList(self,coordsList):
+    def getShapelyPolyFromList(self,coordsList):
         convexPolyPoints=list(MultiPoint(coordsList).convex_hull.exterior.coords)
         shapelyPolygon=Polygon(convexPolyPoints)
         return shapelyPolygon
@@ -822,8 +825,8 @@ class myCrateClass():
         localCoordL=asadsConDCoords[coboKey]
         asadsPolyListForCobo=[]
         for asadCoord in localCoordL:
-            myAsadConPoly=self.getPolyFromList(asadCoord)
-            asadsPolyListForCobo.append(myAsadConPoly)
+            myAsadConShapelyPoly=self.getShapelyPolyFromList(asadCoord)
+            asadsPolyListForCobo.append(myAsadConShapelyPoly)
 
         return asadsPolyListForCobo
 
@@ -844,10 +847,10 @@ class myCrateClass():
             asadsConD[coboIdx]=self.getLocalAsadConL(coboIdx)
         return asadsConD
 
-    def getAsadsConDPoly(self):
+    def getAsadsConDShapelyPoly(self):
         asadsConDPoly={}
         asadsConD=self.asadsConD
         for asadsConKey in asadsConD:
             coordsList=asadsConD[asadsConKey]
-            asadsConDPoly[asadsConKey]=self.getPolyFromList(coordsList)
+            asadsConDPoly[asadsConKey]=self.getShapelyPolyFromList(coordsList)
         return asadsConDPoly
