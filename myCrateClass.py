@@ -219,6 +219,30 @@ class myCrateClass():
 
         # # self.canvasD.delete(self.arc)
 
+        myTestBoxList=self.getTestBoxList()
+        print("###########################")
+        print("myTestBoxList = ",myTestBoxList)
+        print("###########################")
+
+        myTestShapelyPoly=self.createShapelyTestPoly(myTestBoxList)
+
+        newTestBoxList=myTestShapelyPoly.exterior.coords.xy
+
+        print("")
+        print("###########################")
+        print("newTestBoxList = ",newTestBoxList)
+        print("###########################")
+
+        print("Trying out the newest function")
+        prettyBL=self.getCoordsFromShapelyPoly(myTestShapelyPoly)
+        print("")
+        print("###########################")
+        print("prettyBL = ",prettyBL)
+        print("###########################")
+
+        self.drawnTestPol=self.drawPolygons([[prettyBL]])
+
+
     def callbackD(self, event):
         self.myPoint=Point(event.x, event.y)
         indexList=self.checkEventInPolyList(event.x, event.y)
@@ -529,6 +553,22 @@ class myCrateClass():
 
         return boxList
 
+
+    def getTestBoxList(self):
+        shiftX,shiftY=400,100
+        boxW = 100
+        boxH = 100
+
+        # shiftX+=coboIdx*boxW
+        boxList=[[] for i in range(4)]
+
+        boxList[0]=[shiftX,shiftY]
+        boxList[1]=[shiftX,shiftY+boxH]
+        boxList[2]=[shiftX+boxW,shiftY+boxH]
+        boxList[3]=[shiftX+boxW,shiftY]
+
+        return boxList
+
     # def color_config(self, widget, color, event):
     #     widget.configure(foreground=color)
 
@@ -768,6 +808,11 @@ class myCrateClass():
         shapelyPolygon=Polygon(convexPolyPoints)
         return shapelyPolygon
 
+    def createShapelyTestPoly(self,testBoxList):
+        convexPolyPoints=list(MultiPoint(testBoxList).convex_hull.exterior.coords)
+        shapelyPolygon=Polygon(convexPolyPoints)
+        return shapelyPolygon
+
     def getShapelyCoboPolyD(self):
         idxList=self.cobosIDXs
         coboW=self.coboW
@@ -854,3 +899,12 @@ class myCrateClass():
             coordsList=asadsConD[asadsConKey]
             asadsConDPoly[asadsConKey]=self.getShapelyPolyFromList(coordsList)
         return asadsConDPoly
+
+    def getCoordsFromShapelyPoly(self,myShapelyPolygon):
+        uglyBoxList=myShapelyPolygon.exterior.coords.xy
+
+        myXList,myYList=uglyBoxList
+        totLen=len(myXList)
+        #Not sure if the int() is really needed
+        prettyBoxList=[[int(myXList[i]),int(myYList[i])] for i in range(totLen)]
+        return prettyBoxList
