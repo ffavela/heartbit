@@ -31,10 +31,10 @@ class myCrateClass():
         self.asadConW=5
         self.asadConH=48
 
-        self.coboPolyD={}
+        self.shapelyCoboPolyD={}
 
 
-        myAsadCoordsList=self.getAsadCon(1,1)
+        myAsadCoordsList=self.getAsadCon(5,2)
 
         print(myAsadCoordsList)
 
@@ -70,10 +70,10 @@ class myCrateClass():
 
         # v = IntVar()
         # v.set(3)
-        # self.coboPoly=self.createCoboPoly()
+        # self.coboPoly=self.createShapelyCoboPoly()
 
         self.cobosIDXs=[0,1,2,5]
-        self.coboPolyD=self.getCoboPolyD()
+        self.shapelyCoboPolyD=self.getShapelyCoboPolyD()
         self.asadsConDCoords=self.getAsadsConDCoords()
 
         self.asadsPolyListDForAllCobos=\
@@ -240,11 +240,11 @@ class myCrateClass():
         # coboPoly=self.coboPoly
 
         myAsadConShapelyPoly=self.myAsadConShapelyPoly
-        coboPolyD=self.coboPolyD
+        shapelyCoboPolyD=self.shapelyCoboPolyD
 
-        for coboKey in coboPolyD:
-            coboPoly=coboPolyD[coboKey]
-            if coboPoly.contains(myPoint):
+        for coboKey in shapelyCoboPolyD:
+            shapelyCoboPoly=shapelyCoboPolyD[coboKey]
+            if shapelyCoboPoly.contains(myPoint):
                 print("Inside the COBO {}!!".format(coboKey))
                 # Fetching the corresponding list for the asadsD
 
@@ -762,21 +762,21 @@ class myCrateClass():
                 textObj=self.canvasD.create_text(pCent[0],pCent[1])
                 self.canvasD.itemconfig(textObj, text=str(i))
 
-    def createCoboPoly(self,coboIdx):
+    def createShapelyCoboPoly(self,coboIdx):
         coboPolVertex=self.getBoxList(coboIdx)
         convexPolyPoints=list(MultiPoint(coboPolVertex).convex_hull.exterior.coords)
         shapelyPolygon=Polygon(convexPolyPoints)
         return shapelyPolygon
 
-    def getCoboPolyD(self):
+    def getShapelyCoboPolyD(self):
         idxList=self.cobosIDXs
         coboW=self.coboW
-        coboPolyD={}
+        shapelyCoboPolyD={}
         for idx in idxList:
-            coboPoly=self.createCoboPoly(idx)
-            coboPolyD[idx]=coboPoly
+            shapelyCoboPoly=self.createShapelyCoboPoly(idx)
+            shapelyCoboPolyD[idx]=shapelyCoboPoly
 
-        return coboPolyD
+        return shapelyCoboPolyD
 
     def getAsadCon(self,coboIdx,asadIdx):
         shiftX,shiftY=self.shift
