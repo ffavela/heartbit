@@ -226,6 +226,9 @@ class myCrateClass():
 
         myTestShapelyPoly=self.createShapelyTestPoly(myTestBoxList)
 
+        myTestBoxList2=self.getTestBoxList([510,50])
+        myTestShapelyPoly2=self.createShapelyTestPoly(myTestBoxList2)
+
         newTestBoxList=myTestShapelyPoly.exterior.coords.xy
 
         print("")
@@ -240,8 +243,24 @@ class myCrateClass():
         print("prettyBL = ",prettyBL)
         print("###########################")
 
-        self.drawnTestPol=self.drawPolygons([[prettyBL]])
+        # self.drawnTestPol=self.drawPolygons([[prettyBL]])
 
+        # self.drawnTestPol2=self.drawTestPolygon(myTestShapelyPoly)
+        # self.drawnTestPol3=self.drawTestPolygon(myTestShapelyPoly2)
+
+        myShapelyTestDict={}
+        myShapelyTestDict[3]=myTestShapelyPoly
+        myShapelyTestDict["frank"]=myTestShapelyPoly2
+
+        drawnTestPolygonD=self.getDrawnTestPolygonD(myShapelyTestDict)
+
+        drawnTestPolygonCobosD=self.getDrawnTestPolygonD(self.shapelyCoboPolyD)
+        print("the asads part ")
+        print(self.asadsPolyListDForAllCobos[0])
+
+        # myDrawnPolyInList=self.getDrawnTestPolygonL(self.asadsPolyListDForAllCobos[5])
+
+        myDrawnPolyInDWithLists=self.getDrawnTestPolygonDOfL(self.asadsPolyListDForAllCobos)
 
     def callbackD(self, event):
         self.myPoint=Point(event.x, event.y)
@@ -429,6 +448,58 @@ class myCrateClass():
 
         return polyDrawnL
 
+    def drawTestPolygon(self, myShapelyPolygon):
+        polyCoords=self.getCoordsFromShapelyPoly(myShapelyPolygon)
+        color="cyan"
+        myPol=self.canvasU.create_polygon(polyCoords,\
+                                          fill=color,\
+                                          stipple="gray50",\
+                                          outline="#f12",\
+                                          width=2)
+        return myPol
+
+    #For the simple boxes of the COBOs, for example
+    def getDrawnTestPolygonD(self, myShapelyPolygonD):
+        drawnTestPolygonD={}
+        for e in myShapelyPolygonD:
+            polyCoords=self.getCoordsFromShapelyPoly(myShapelyPolygonD[e])
+            color="cyan"
+            myPol=self.canvasU.create_polygon(polyCoords,\
+                                              fill=color,\
+                                              stipple="gray50",\
+                                              outline="#f12",\
+                                              width=2)
+            drawnTestPolygonD[e]=myPol
+
+        return drawnTestPolygonD
+
+    #For the asad list part, for example
+    def getDrawnTestPolygonL(self, myShapelyPolygonL):
+        drawnTestPolygonL=[]
+        for e in myShapelyPolygonL:
+            myVar=e
+            polyCoords=self.getCoordsFromShapelyPoly(myVar)
+            color="green"
+            myPol=self.canvasU.create_polygon(polyCoords,\
+                                              fill=color,\
+                                              stipple="gray50",\
+                                              outline="#f12",\
+                                              width=2)
+            drawnTestPolygonL.append(myPol)
+
+        return drawnTestPolygonL
+
+
+    #For the asad dictionary with lists part, for example
+    def getDrawnTestPolygonDOfL(self,myShapelyPolygonDOfL):
+        drawnTestPolygonDOfL={}
+        for coboKey in myShapelyPolygonDOfL:
+            myShapelyPolygonL=myShapelyPolygonDOfL[coboKey]
+            myDrawnTestPolygonL=self.getDrawnTestPolygonL(myShapelyPolygonL)
+            drawnTestPolygonDOfL[coboKey]=myDrawnTestPolygonL
+
+        return drawnTestPolygonDOfL
+
     def fillAllRings(self):
         sideList=self.sideList
         masterList=[[] for t in sideList]
@@ -554,8 +625,8 @@ class myCrateClass():
         return boxList
 
 
-    def getTestBoxList(self):
-        shiftX,shiftY=400,100
+    def getTestBoxList(self,shifts=[400,100]):
+        shiftX,shiftY=shifts
         boxW = 100
         boxH = 100
 
