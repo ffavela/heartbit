@@ -40,12 +40,12 @@ class myCrateClass():
 
         self.myAsadConShapelyPoly=self.getShapelyPolyFromList(myAsadCoordsList)
 
-        self.W=850
+        self.W=900
         self.H=750
         self.center=[int(self.W/2),int(self.H/2)]
         self.BigR=int(min(self.W,self.H)/2)
 
-        self.UW=750
+        self.UW=780
         self.UH=323
 
         # self.vList=[]
@@ -72,7 +72,7 @@ class myCrateClass():
         # v.set(3)
         # self.coboPoly=self.createShapelyCoboPoly()
 
-        self.cobosIDXs=[0,1,2,5]
+        self.cobosIDXs=[0,1,2,3,4,5,6,7,10,11]
         self.shapelyCoboPolyD=self.getShapelyCoboPolyD()
         self.asadsConDCoords=self.getAsadsConDCoords()
 
@@ -219,46 +219,7 @@ class myCrateClass():
 
         # # self.canvasD.delete(self.arc)
 
-        myTestBoxList=self.getTestBoxList()
-        print("###########################")
-        print("myTestBoxList = ",myTestBoxList)
-        print("###########################")
-
-        myTestShapelyPoly=self.createShapelyTestPoly(myTestBoxList)
-
-        myTestBoxList2=self.getTestBoxList([510,50])
-        myTestShapelyPoly2=self.createShapelyTestPoly(myTestBoxList2)
-
-        newTestBoxList=myTestShapelyPoly.exterior.coords.xy
-
-        print("")
-        print("###########################")
-        print("newTestBoxList = ",newTestBoxList)
-        print("###########################")
-
-        print("Trying out the newest function")
-        prettyBL=self.getCoordsFromShapelyPoly(myTestShapelyPoly)
-        print("")
-        print("###########################")
-        print("prettyBL = ",prettyBL)
-        print("###########################")
-
-        # self.drawnTestPol=self.drawPolygons([[prettyBL]])
-
-        # self.drawnTestPol2=self.drawTestPolygon(myTestShapelyPoly)
-        # self.drawnTestPol3=self.drawTestPolygon(myTestShapelyPoly2)
-
-        myShapelyTestDict={}
-        myShapelyTestDict[3]=myTestShapelyPoly
-        myShapelyTestDict["frank"]=myTestShapelyPoly2
-
-        drawnTestPolygonD=self.getDrawnTestPolygonD(myShapelyTestDict)
-
         drawnTestPolygonCobosD=self.getDrawnTestPolygonD(self.shapelyCoboPolyD)
-        print("the asads part ")
-        print(self.asadsPolyListDForAllCobos[0])
-
-        # myDrawnPolyInList=self.getDrawnTestPolygonL(self.asadsPolyListDForAllCobos[5])
 
         myDrawnPolyInDWithLists=self.getDrawnTestPolygonDOfL(self.asadsPolyListDForAllCobos)
 
@@ -614,7 +575,7 @@ class myCrateClass():
         coboW = self.coboW
         coboH = self.coboH
 
-        shiftX+=coboIdx*coboW
+        shiftX=self.getRightShiftX(coboIdx)
         boxList=[[] for i in range(4)]
 
         boxList[0]=[shiftX,shiftY]
@@ -902,7 +863,7 @@ class myCrateClass():
         asadW = self.asadConW
         asadH = self.asadConH
 
-        shiftX+=coboIdx*coboW
+        shiftX=self.getRightShiftX(coboIdx)
 
         if asadIdx in [0,1]:
             shiftY+=34
@@ -979,3 +940,17 @@ class myCrateClass():
         #Not sure if the int() is really needed
         prettyBoxList=[[int(myXList[i]),int(myYList[i])] for i in range(totLen)]
         return prettyBoxList
+
+    def getRightShiftX(self,coboIdx):
+        shiftX=self.shift[0]
+
+        coboW=self.coboW
+
+        shiftX+=coboW #excluding the first slot
+
+        if coboIdx >=5:
+            #jump the network and mutant slots
+            shiftX+=2*coboW
+        shiftX+=coboIdx*coboW
+
+        return shiftX
