@@ -220,6 +220,8 @@ class myCrateClass():
         # # self.canvasD.delete(self.arc)
 
         drawnTestPolygonCobosD=self.getDrawnShapelyPolygonD(self.shapelyCoboPolyD)
+        print("drawnTestPolygonCobosD[2] = ",drawnTestPolygonCobosD[2])
+        self.canvasU.itemconfig(drawnTestPolygonCobosD[2],fill="red")
 
         myDrawnPolyInDWithLists=self.getDrawnShapelyPolygonDOfL(self.asadsPolyListDForAllCobos)
 
@@ -409,9 +411,9 @@ class myCrateClass():
 
         return polyDrawnL
 
-    def getDrawnShapelyPolygon(self, myShapelyPolygon):
+    def getDrawnShapelyPolygon(self, myShapelyPolygon,color="cyan"):
         polyCoords=self.getCoordsFromShapelyPoly(myShapelyPolygon)
-        color="cyan"
+        # color="#000080"
         myPol=self.canvasU.create_polygon(polyCoords,\
                                           fill=color,\
                                           stipple="gray50",\
