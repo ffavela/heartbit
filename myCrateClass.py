@@ -219,9 +219,9 @@ class myCrateClass():
 
         # # self.canvasD.delete(self.arc)
 
-        drawnTestPolygonCobosD=self.getDrawnTestPolygonD(self.shapelyCoboPolyD)
+        drawnTestPolygonCobosD=self.getDrawnShapelyPolygonD(self.shapelyCoboPolyD)
 
-        myDrawnPolyInDWithLists=self.getDrawnTestPolygonDOfL(self.asadsPolyListDForAllCobos)
+        myDrawnPolyInDWithLists=self.getDrawnShapelyPolygonDOfL(self.asadsPolyListDForAllCobos)
 
     def callbackD(self, event):
         self.myPoint=Point(event.x, event.y)
@@ -409,7 +409,7 @@ class myCrateClass():
 
         return polyDrawnL
 
-    def drawTestPolygon(self, myShapelyPolygon):
+    def getDrawnShapelyPolygon(self, myShapelyPolygon):
         polyCoords=self.getCoordsFromShapelyPoly(myShapelyPolygon)
         color="cyan"
         myPol=self.canvasU.create_polygon(polyCoords,\
@@ -420,22 +420,16 @@ class myCrateClass():
         return myPol
 
     #For the simple boxes of the COBOs, for example
-    def getDrawnTestPolygonD(self, myShapelyPolygonD):
+    def getDrawnShapelyPolygonD(self, myShapelyPolygonD):
         drawnTestPolygonD={}
         for e in myShapelyPolygonD:
-            polyCoords=self.getCoordsFromShapelyPoly(myShapelyPolygonD[e])
-            color="cyan"
-            myPol=self.canvasU.create_polygon(polyCoords,\
-                                              fill=color,\
-                                              stipple="gray50",\
-                                              outline="#f12",\
-                                              width=2)
+            myPol=self.getDrawnShapelyPolygon(myShapelyPolygonD[e])
             drawnTestPolygonD[e]=myPol
 
         return drawnTestPolygonD
 
     #For the asad list part, for example
-    def getDrawnTestPolygonL(self, myShapelyPolygonL):
+    def getDrawnShapelyPolygonL(self, myShapelyPolygonL):
         drawnTestPolygonL=[]
         for e in myShapelyPolygonL:
             myVar=e
@@ -452,11 +446,11 @@ class myCrateClass():
 
 
     #For the asad dictionary with lists part, for example
-    def getDrawnTestPolygonDOfL(self,myShapelyPolygonDOfL):
+    def getDrawnShapelyPolygonDOfL(self,myShapelyPolygonDOfL):
         drawnTestPolygonDOfL={}
         for coboKey in myShapelyPolygonDOfL:
             myShapelyPolygonL=myShapelyPolygonDOfL[coboKey]
-            myDrawnTestPolygonL=self.getDrawnTestPolygonL(myShapelyPolygonL)
+            myDrawnTestPolygonL=self.getDrawnShapelyPolygonL(myShapelyPolygonL)
             drawnTestPolygonDOfL[coboKey]=myDrawnTestPolygonL
 
         return drawnTestPolygonDOfL
