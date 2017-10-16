@@ -63,14 +63,65 @@ class myAwesomeClass():
         lUpFrame = Frame(leftFrame)
         lUpFrame.pack(side=TOP)
 
+        ##new part begin
+        lUptFrame = Frame(lUpFrame)
+        lUptFrame.pack(side=TOP)
+
+        lUplFrame = Frame(lUpFrame)
+        lUplFrame.pack(side=LEFT)
+
+        lUprFrame = Frame(lUpFrame)
+        lUprFrame.pack(side=RIGHT)
+
+        lUprlFrame = Frame(lUprFrame)
+        lUprlFrame.pack(side=LEFT)
+
+        lUprrFrame = Frame(lUprFrame)
+        lUprrFrame.pack(side=RIGHT)
+
+        ###new end
+
         lDownFrame = Frame(leftFrame)
         lDownFrame.pack(side=BOTTOM)
+
+        # new part begin
+        lUpFrame = Frame(leftFrame)
+        lUpFrame.pack(side=TOP)
+
+        lDownFrame = Frame(leftFrame)
+        lDownFrame.pack(side=BOTTOM)
+        # new end
 
         rUpFrame = Frame(rightFrame)
         rUpFrame.pack(side=TOP)
 
         rDownFrame = Frame(rightFrame)
         rDownFrame.pack(side=BOTTOM)
+
+        # ################Options part BEGIN ###########################
+
+        # font.nametofont('TkDefaultFont').configure(size=5)
+        # MyFont = font.Font(weight='bold')
+        optSel=Label(lUplFrame,text='select', anchor="n", width=12)
+        optSel.pack(side=LEFT)
+
+        self.optionList = ('True', 'False')
+        self.v = StringVar()
+        self.v.set(self.optionList[0])
+        self.om = OptionMenu(lUprlFrame, self.v, *self.optionList)
+        oMenuWidth = len(max(self.optionList, key=len))
+        self.om.config(width=oMenuWidth)
+        # self.om.config( height = 3, width = 1 )
+        # self.om.config(width=1)
+        self.om.pack(side=BOTTOM)
+        self.var = StringVar()
+        self.var.set('hello')
+
+        self.statTxt=Label(lUprrFrame, textvariable=self.var)
+        self.statTxt.pack(side=RIGHT)
+
+        # ################Options part END #################
+
 
         self.printButton = Button(lUpFrame, text="Save", command=self.printMessage)
         self.printButton.pack(side=LEFT)
@@ -112,7 +163,7 @@ class myAwesomeClass():
         self.drawZone1()
 
         self.dummyVar=getOptVal(self.doc,1,3,1,5, "isActive")
-
+        print(self.dummyVar)
         self.canvasD.bind("<Key>", self.key)
         self.canvasD.bind("<Button-1>", self.callbackD)
         self.canvasD.pack()
@@ -121,6 +172,7 @@ class myAwesomeClass():
 
     def callbackD(self, event):
         self.myPoint=Point(event.x, event.y)
+        # indexList has index info about where the click was made
         indexList=self.checkEventInPolyList(event.x, event.y)
         if indexList != []:
             print("zoneIndex = ", self.listIndex)
@@ -128,6 +180,13 @@ class myAwesomeClass():
             localOnOffL=self.masterList[self.listIndex][3]
             onOffVal=localOnOffL[indexList[0]][indexList[1]]
             print("ondOffVal = ", onOffVal)
+
+            self.var.set(str(onOffVal))
+            if onOffVal == True:
+                self.v.set(self.optionList[0])
+            else:
+                self.v.set(self.optionList[1])
+
             self.redrawRing(indexList)
             self.writeRegionInfo(self.listIndex)
             self.writeDetectInfo(self.listIndex,indexList)
@@ -234,14 +293,18 @@ class myAwesomeClass():
 
             if indexStuff != []:
                 if indexStuff[0] == i and polyIndex == indexStuff[1]:
-                    if self.onOffList[i][polyIndex] == True:
-                        self.onOffList[i][polyIndex] = False
-                        color="red"
-                    else:
-                        self.onOffList[i][polyIndex] = True
-                        color="green"
-                        if i%2 == 0:
-                            color="blue"
+
+                    color="yellow"
+                    #The toggle of the state (True or False) should
+                    #not be here
+                    # if self.onOffList[i][polyIndex] == True:
+                    #     # self.onOffList[i][polyIndex] = False
+                    #     color="red"
+                    # else:
+                    #     # self.onOffList[i][polyIndex] = True
+                    #     color="green"
+                    #     if i%2 == 0:
+                    #         color="blue"
             return color
 
         polyDrawnL=[[] for e in poly4DrawList]

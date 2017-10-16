@@ -118,7 +118,8 @@ class myCrateClass():
         optHeaders=Label(lUptFrame,text='Options Menu', anchor="n", width=12)
         optHeaders.pack(side=TOP)
 
-        ################Options part BEGIN #################################
+        ################Options part BEGIN
+        #################################################
 
         # font.nametofont('TkDefaultFont').configure(size=5)
         # MyFont = font.Font(weight='bold')
